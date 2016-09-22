@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="44f7a7b0-6c80-4eb6-a25e-fdc81f19f9f4" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/data.py" afterPath="$PROJECT_DIR$/data/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py" afterPath="$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/paras/paras.py" afterPath="$PROJECT_DIR$/paras/paras.py" />
     </list>
     <ignored path="OrderFlowPredictNew.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -42,8 +38,8 @@
       <file leaf-file-name="data.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+            <state relative-caret-position="424">
+              <caret line="40" column="13" selection-start-line="40" selection-start-column="13" selection-end-line="40" selection-end-column="13" />
               <folding>
                 <element signature="e#77#86#0" expanded="true" />
               </folding>
@@ -574,7 +570,14 @@
       <option name="project" value="LOCAL" />
       <updated>1474529524113</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add moving average, but have not been checked">
+      <created>1474537512476</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1474537512476</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -613,7 +616,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add new demean method 1.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="add new demean method 1.0" />
+    <MESSAGE value="add moving average, but have not been checked" />
+    <option name="LAST_COMMIT_MESSAGE" value="add moving average, but have not been checked" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1081,8 +1085,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+        <state relative-caret-position="424">
+          <caret line="40" column="13" selection-start-line="40" selection-start-column="13" selection-end-line="40" selection-end-column="13" />
           <folding>
             <element signature="e#77#86#0" expanded="true" />
           </folding>

@@ -27,22 +27,23 @@ def main():
     # ==========================description=======================
     # description = 'rolling_model_selection_one_year_buy_more_lags_not_normalize_const_zero'  # todo
     # description = 'rolling_model_selection_one_year_sell_all_vars'  # todo
-    description = 'rolling_model_selection_one_month_predict_one_month_normalized_by_one_month'
+    description = 'rolling_model_selection_twelve_month_predict_one_month_normalized_by_one_month_add_high_order'
 
     # training_period = '12M'
-    training_period = '1M'
+    training_period = '12M'
     testing_period = '1M'
     testing_demean_period = '12M'
 
     # ==========================paras============================
-    my_para = paras.paras.Paras().paras1
+    # my_para = paras.paras.Paras().paras1
+    my_para = paras.paras.Paras().paras1_high_order
     # my_para = paras.paras.Paras().paras1_not_const
     # my_para = paras.paras.Paras().paras1_sell
     # my_para = paras.paras.Paras().paras_after_selection
     # my_para = paras.paras.Paras().paras_neat_buy
 
     normalize = True
-    add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
+    add_const = my_para['add_const']
 
     # ==========================output path======================
     time_now_str = util.util.get_timenow_str()
@@ -59,7 +60,7 @@ def main():
 
     # ============================loading data====================
     my_log.info('data begin')
-    data_rolling = data.data.DataRolling(rolling_date_begin, rolling_date_end, my_para, training_period, testing_period, testing_demean_period = '12M')
+    data_rolling = data.data.DataRolling(rolling_date_begin, rolling_date_end, my_para, training_period, testing_period, testing_demean_period=testing_demean_period)
     my_log.info('data end')
 
     # ============================rolling==========================

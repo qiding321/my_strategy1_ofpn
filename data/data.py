@@ -14,6 +14,7 @@ import util.util
 import my_path.path
 import log.log
 import data.reg_data
+import re
 
 my_log = log.log.log_order_flow_predict
 
@@ -27,15 +28,23 @@ class DataBase:
         if not have_data_df:
             self.date_begin = date_begin
             self.date_end = date_end
-            if 'buy_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars']:
-                self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
 
-                # pre-treat intraday_pattern
-                for col in ['buy_vol_5min_intraday_pattern_20_days', 'sell_vol_5min_intraday_pattern_20_days']:
-                    if col in self.para_dict['x_vars']:
-                        self.data_df[col] = self._get_one_col(col)
+            if 'x_vars_moving_average' in self.para_dict.keys():
+                self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin,
+                                                                date_end=date_end)
+                for var_moving_average in self.para_dict['x_vars_moving_average']:
+                    self.data_df[var_moving_average] = self._get_one_col(var_moving_average)
             else:
-                self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
+                self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)            #
+            # if 'buy_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars']:
+            #     self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
+            #
+            #     # pre-treat intraday_pattern
+            #     for col in ['buy_vol_5min_intraday_pattern_20_days', 'sell_vol_5min_intraday_pattern_20_days']:
+            #         if col in self.para_dict['x_vars']:
+            #             self.data_df[col] = self._get_one_col(col)
+            # else:
+            #     self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
         else:
             data_df = data_df.sort_index()
             self.date_begin = data_df.index[0]
@@ -179,7 +188,14 @@ class DataBase:
         y_vars_name = self.para_dict['y_vars']
         y_vars = self._get_vars(y_vars_name, time_freq)
 
-        x_vars_name = self.para_dict['x_vars']
+        x_vars_name_raw = self.para_dict['x_vars']
+        if 'high_order2_term_x' in self.para_dict.keys():
+            x_vars_name_high_order2_ = self.para_dict['high_order2_term_x']
+            x_vars_name_high_order2 = [x_var_ + '_order2' for x_var_ in x_vars_name_high_order2_]
+            x_vars_name = x_vars_name_raw + x_vars_name_high_order2
+        else:
+            x_vars_name = x_vars_name_raw
+
         x_vars = self._get_vars(x_vars_name, time_freq)
 
         data_merged = pd.DataFrame(pd.concat([x_vars, y_vars], keys=['x', 'y'], axis=1))
@@ -300,6 +316,30 @@ class DataBase:
             vol_long = vol_wide_rolling_mean.stack()
 
             data_new = pd.DataFrame(vol_long[data_vol['new_index']]).set_index(data_vol.index)[0]
+        # moving average terms
+        elif var_name in [
+            'buyvolume_mean5days', 'buyvolume_mean20days', 'buyvolume_mean1day',
+            'sellvolume_mean5days', 'sellvolume_mean20days', 'sellvolume_mean1day',
+            'volume_index50_mean5days', 'volume_index50_mean20days', 'volume_index50_mean1day',
+            'volume_index300_mean5days', 'volume_index300_mean20days', 'volume_index300_mean1day',
+            ]:
+            var_name_prefix = '_'.join(var_name.split('_')[:-1])
+            ma_days = int(re.search('(?<=mean)\d.(?=day)',var_name).group())
+            data_col = data_raw[[var_name_prefix]]
+            data_col.loc[:, 'index'] = data_col.index
+            data_col.loc[:, 'date'] = data_col['index'].apply(lambda x: (x.year, x.month, x.day))
+            data_col['new_index'] = data_col['date']
+
+            data_mean_by_date_and_period = data_col.groupby(['date'])[var_name_prefix].mean()
+            data_wide = data_mean_by_date_and_period.unstack().sort_index()
+            data_wide_rolling_mean = data_wide.rolling(window=20).mean().shift(1)
+            data_long = data_wide_rolling_mean.stack()
+            data_new = pd.DataFrame(data_long[data_col['new_index']]).set_index(data_col.index)[0]
+
+        elif var_name.endswith('_order2'):  # todo
+            var_name_prefix = var_name[:-7]
+            data_new_ = self._get_one_col(var_name_prefix)
+            data_new = data_new_.values * data_new_.values
         else:
             my_log.error(var_name)
             raise LookupError

@@ -25,24 +25,28 @@ def main():
     rolling_date_end = '20160831'
 
     # ==========================description=======================
-    description = 'rolling_model_selection_one_year_buy_more_lags_not_normalize_const_zero'  # todo
+    # description = 'rolling_model_selection_one_year_buy_more_lags_not_normalize_const_zero'  # todo
     # description = 'rolling_model_selection_one_year_sell_all_vars'  # todo
-    training_period = '12M'
+    description = 'rolling_model_selection_one_month_predict_one_month_normalized_by_one_month'
+
+    # training_period = '12M'
+    training_period = '1M'
     testing_period = '1M'
+    testing_demean_period = '12M'
 
     # ==========================paras============================
-    # my_para = paras.paras.Paras().paras1
-    my_para = paras.paras.Paras().paras1_not_const
+    my_para = paras.paras.Paras().paras1
+    # my_para = paras.paras.Paras().paras1_not_const
     # my_para = paras.paras.Paras().paras1_sell
     # my_para = paras.paras.Paras().paras_after_selection
     # my_para = paras.paras.Paras().paras_neat_buy
 
-    normalize = False
+    normalize = True
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
 
     # ==========================output path======================
     time_now_str = util.util.get_timenow_str()
-    output_path = my_path.path.market_making_result_root + description + time_now_str + '\\'
+    output_path = my_path.path.market_making_result_root + time_now_str + description + '\\'
 
     # =========================log================================
     my_log = log.log.log_order_flow_predict
@@ -55,16 +59,19 @@ def main():
 
     # ============================loading data====================
     my_log.info('data begin')
-    data_rolling = data.data.DataRolling(rolling_date_begin, rolling_date_end, my_para, training_period, testing_period)
+    data_rolling = data.data.DataRolling(rolling_date_begin, rolling_date_end, my_para, training_period, testing_period, testing_demean_period = '12M')
     my_log.info('data end')
 
     # ============================rolling==========================
     model_selection_result = dict()
     for data_rolling_once in data_rolling.generating_rolling_data():
         # ============================normalize data=================
-        data_training, data_predicting, in_sample_period, out_of_sample_period = [data_rolling_once[col] for col in ['data_training', 'data_predicting', 'in_sample_period', 'out_of_sample_period']]
+        data_training, data_predicting, data_demean, in_sample_period, out_of_sample_period = [
+            data_rolling_once[col] for col in ['data_training', 'data_predicting', 'data_out_of_sample_demean', 'in_sample_period', 'out_of_sample_period']
+            ]
         assert isinstance(data_training, data.data.TrainingData) and isinstance(data_predicting, data.data.TestingData)
-        reg_data_training, normalize_funcs = data_training.generate_reg_data(normalize=normalize)
+        reg_data_training, normalize_funcs_useless = data_training.generate_reg_data(normalize=normalize)
+        reg_data_demean_useless, normalize_funcs = data_demean.generate_reg_data(normalize=normalize)
         reg_data_testing, normalize_funcs = data_predicting.generate_reg_data(normalize_funcs=normalize_funcs, normalize=normalize)
 
         assert isinstance(reg_data_training, data.reg_data.RegDataTraining)

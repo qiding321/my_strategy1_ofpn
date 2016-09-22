@@ -331,10 +331,11 @@ class TestingData(DataBase):
 
 
 class DataRolling(DataBase):
-    def __init__(self, date_begin, date_end, para_dict, training_period, testing_period):
+    def __init__(self, date_begin, date_end, para_dict, training_period, testing_period, testing_demean_period=None):
         DataBase.__init__(self, date_begin, date_end, para_dict)
         self.training_period = training_period
         self.testing_period = testing_period
+        self.test_demean_period = testing_demean_period
 
     def generating_rolling_data(self, fixed=False):
 
@@ -351,8 +352,17 @@ class DataRolling(DataBase):
             my_log.error('training_period: ' + self.training_period)
             my_log.error('testing_period: ' + self.testing_period)
             raise AssertionError
+
+        if self.test_demean_period is None:
+            offset_test_demean = offset_training
+        else:
+            if self.test_demean_period == '12M':
+                offset_test_demean = pd.tseries.offsets.MonthEnd(12)
+            else:
+                raise ValueError
+
         offset_one_day = pd.tseries.offsets.Day(1)
-        keys = ['data_training', 'data_predicting', 'in_sample_period', 'out_of_sample_period']
+        keys = ['data_training', 'data_predicting', 'data_out_of_sample_demean', 'in_sample_period', 'out_of_sample_period', 'demean_period']
 
         my_data = self.data_df
 
@@ -370,6 +380,8 @@ class DataRolling(DataBase):
                 training_date_end = date_moving + offset_training
                 predict_date_begin = training_date_end + offset_one_day
                 predict_date_end = predict_date_begin + offset_predict
+                demean_date_begin = predict_date_begin - offset_one_day - offset_test_demean
+                demean_date_end = predict_date_begin - offset_one_day
             else:
                 # training_date_begin_ = date_moving
                 training_date_end_ = date_moving + offset_training
@@ -377,20 +389,30 @@ class DataRolling(DataBase):
                 predict_date_begin = training_date_end_ + offset_one_day
                 predict_date_end = predict_date_begin + offset_predict
 
+                demean_date_begin = predict_date_begin - offset_one_day - offset_test_demean
+                demean_date_end = predict_date_begin - offset_one_day
+
+            if training_date_begin < date_begin or demean_date_begin < date_begin:
+                continue
+
             if predict_date_end > date_end or training_date_end > date_end:
                 raise StopIteration
 
             data_training_df = my_data.select(lambda x: training_date_end >= x >= training_date_begin)
             data_predicting_df = my_data.select(lambda x: predict_date_end >= x >= predict_date_begin)
+            data_out_of_sample_demean_df = my_data.select(lambda x: demean_date_end >= x >= demean_date_begin)
+
             data_training = TrainingData(data_df=data_training_df, have_data_df=True, para_dict=self.para_dict)
             data_predicting = TestingData(data_df=data_predicting_df, have_data_df=True, para_dict=self.para_dict)
+            data_out_of_sample_demean = TrainingData(data_df=data_out_of_sample_demean_df, have_data_df=True, para_dict=self.para_dict)
 
             in_sample_period = ''.join([training_date_begin.strftime('%Y%m%d'), '_', training_date_end.strftime('%Y%m%d')])
             out_of_sample_period = ''.join([predict_date_begin.strftime('%Y%m%d'), '_', predict_date_end.strftime('%Y%m%d')])
+            demean_period = ''.join([demean_date_begin.strftime('%Y%m%d'), '_', demean_date_end.strftime('%Y%m%d')])
 
-            to_yield = dict(list(zip(keys, [data_training, data_predicting, in_sample_period, out_of_sample_period])))
+            to_yield = dict(list(zip(keys, [data_training, data_predicting, data_out_of_sample_demean, in_sample_period, out_of_sample_period, demean_period])))
 
-            my_log.info('data_training: {}\ndata_predicting: {}'.format(in_sample_period, out_of_sample_period))
+            my_log.info('data_training: {}\ndata_predicting: {}\ndemean_period: {}'.format(in_sample_period, out_of_sample_period, demean_date_end))
 
             yield to_yield
             date_moving = date_moving + offset_predict

@@ -33,6 +33,8 @@ class Paras:
                 ],
             # 'y_vars': ['sellvolume'],
             'y_vars': ['buyvolume'],
+            'add_const': True,
+            # 'add_const': False,
             'spread_threshold': (0 * self.min_tick, 100 * self.min_tick)
         }
         return d

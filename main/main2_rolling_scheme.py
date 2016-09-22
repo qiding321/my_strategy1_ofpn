@@ -25,8 +25,9 @@ def main():
     # description = 'rolling_new_one_year_not_normalized_neat_buy'  # todo
     # description = 'rolling_one_year_normalized_neat_buy'  # todo
     # description = 'rolling_new_one_year_not_normalized_buy'  # todo
-    # description = 'rolling_one_year_normalized_buy'  # todo
-    description = 'rolling_one_year_normalized_buy_selected_vars'  # todo
+    # description = 'rolling_one_year_normalized_buy_68vars_add_const'  # todo
+    description = 'rolling_one_year_normalized_buy_68vars_not_add_const'  # todo
+    # description = 'rolling_one_year_normalized_buy_selected_vars'  # todo
     # description = 'test'  # todo
     training_period = '12M'
     testing_period = '1M'
@@ -34,8 +35,8 @@ def main():
     # normalize = False
 
     # ==========================paras============================
-    # my_para = paras.paras.Paras().paras1  # todo
-    my_para = paras.paras.Paras().paras_after_selection  # todo
+    my_para = paras.paras.Paras().paras1  # todo
+    # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
 
@@ -76,7 +77,6 @@ def main():
         name = in_sample_period + '_' + out_of_sample_period
         err_testing = reg_data_testing.get_err(add_const=add_const)
         reg_data_testing.report_err(output_path, err_testing, name=name)
-
 
 
 if __name__ == '__main__':

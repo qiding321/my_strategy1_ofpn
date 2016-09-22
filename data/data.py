@@ -35,7 +35,7 @@ class DataBase:
                 for var_moving_average in self.para_dict['x_vars_moving_average']:
                     self.data_df[var_moving_average] = self._get_one_col(var_moving_average)
             else:
-                self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)            #
+                self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
             # if 'buy_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars']:
             #     self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
             #
@@ -322,19 +322,19 @@ class DataBase:
             'sellvolume_mean5days', 'sellvolume_mean20days', 'sellvolume_mean1day',
             'volume_index50_mean5days', 'volume_index50_mean20days', 'volume_index50_mean1day',
             'volume_index300_mean5days', 'volume_index300_mean20days', 'volume_index300_mean1day',
-            ]:
+        ]:
             var_name_prefix = '_'.join(var_name.split('_')[:-1])
-            ma_days = int(re.search('(?<=mean)\d.(?=day)',var_name).group())
+            ma_days = int(re.search('(?<=mean)\d+(?=day)',var_name).group())
             data_col = data_raw[[var_name_prefix]]
             data_col.loc[:, 'index'] = data_col.index
             data_col.loc[:, 'date'] = data_col['index'].apply(lambda x: (x.year, x.month, x.day))
             data_col['new_index'] = data_col['date']
 
             data_mean_by_date_and_period = data_col.groupby(['date'])[var_name_prefix].mean()
-            data_wide = data_mean_by_date_and_period.unstack().sort_index()
-            data_wide_rolling_mean = data_wide.rolling(window=20).mean().shift(1)
-            data_long = data_wide_rolling_mean.stack()
-            data_new = pd.DataFrame(data_long[data_col['new_index']]).set_index(data_col.index)[0]
+            data_wide = data_mean_by_date_and_period.sort_index()
+            data_wide_rolling_mean = data_wide.rolling(window=ma_days).mean().shift(1)
+            data_long = data_wide_rolling_mean
+            data_new = pd.DataFrame(data_long[data_col['new_index']]).set_index(data_col.index)
 
         elif var_name.endswith('_order2'):  # todo
             var_name_prefix = var_name[:-7]

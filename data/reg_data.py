@@ -45,7 +45,7 @@ class RegDataTraining:
         df = pd.concat([coef, tvalues], keys=['coef', 'tvalues'], axis=1).T
         to_ret = util.util.pandas2str(df, title='training_result')
 
-        to_ret += '\nrsquared,{}'.format(self.paras.rsquared)
+        to_ret += 'rsquared,{}'.format(self.paras.rsquared)
 
         return to_ret
 

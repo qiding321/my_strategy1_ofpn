@@ -396,6 +396,9 @@ class DataRolling(DataBase):
         if self.training_period == '12M' and self.testing_period == '1M':
             offset_training = pd.tseries.offsets.MonthEnd(12)  # todo
             offset_predict = pd.tseries.offsets.MonthEnd(1)
+        elif self.training_period == '18M' and self.testing_period == '1M':
+            offset_training = pd.tseries.offsets.MonthEnd(18)
+            offset_predict = pd.tseries.offsets.MonthEnd(1)
         elif self.training_period == '6M' and self.testing_period == '1M':
             offset_training = pd.tseries.offsets.MonthEnd(6)
             offset_predict = pd.tseries.offsets.MonthEnd(1)
@@ -412,6 +415,10 @@ class DataRolling(DataBase):
         else:
             if self.test_demean_period == '12M':
                 offset_test_demean = pd.tseries.offsets.MonthEnd(12)
+            elif self.test_demean_period == '1M':
+                offset_test_demean = pd.tseries.offsets.MonthEnd(1)
+            elif self.test_demean_period == '6M':
+                offset_test_demean = pd.tseries.offsets.MonthEnd(6)
             else:
                 raise ValueError
 

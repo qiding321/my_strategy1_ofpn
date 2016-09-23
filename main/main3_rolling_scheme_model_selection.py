@@ -17,6 +17,21 @@ import paras.paras
 import util.const
 import util.util
 
+# ==========================description=======================
+# description = 'rolling_model_selection_one_year_buy_more_lags_not_normalize_const_zero'  # todo
+# description = 'rolling_model_selection_one_year_sell_all_vars'  # todo
+# description = 'rolling_model_selection_one_month_predict_one_month_normalized_by_one_month_add_ma_add_high_order'
+
+# training_period = '12M'
+training_period = '12M'
+testing_period = '1M'
+testing_demean_period = '12M'
+description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
+
+# ==========================output path======================
+time_now_str = util.util.get_timenow_str()
+output_path = my_path.path.market_making_result_root + time_now_str + description + '\\'
+
 
 def main():
 
@@ -24,16 +39,6 @@ def main():
     rolling_date_begin = '20130801'
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
-
-    # ==========================description=======================
-    # description = 'rolling_model_selection_one_year_buy_more_lags_not_normalize_const_zero'  # todo
-    # description = 'rolling_model_selection_one_year_sell_all_vars'  # todo
-    description = 'rolling_model_selection_twelve_month_predict_one_month_normalized_by_one_month_add_high_order'
-
-    # training_period = '12M'
-    training_period = '12M'
-    testing_period = '1M'
-    testing_demean_period = '12M'
 
     # ==========================paras============================
     # my_para = paras.paras.Paras().paras1
@@ -46,15 +51,11 @@ def main():
     normalize = True
     add_const = my_para['add_const']
 
-    # ==========================output path======================
-    time_now_str = util.util.get_timenow_str()
-    output_path = my_path.path.market_making_result_root + time_now_str + description + '\\'
-
     # =========================log================================
     my_log = log.log.log_order_flow_predict
     my_log.info('description: %s' % description)
-    my_log.info('rolling_date_begin: {}\nrolling_date_end: {}\ntraining period: {}\ntesting period: {}'
-                .format(rolling_date_begin, rolling_date_end, training_period, testing_period))
+    my_log.info('rolling_date_begin: {}\nrolling_date_end: {}\ntraining period: {}\ntesting period: {}\ndemean period: {}'
+                .format(rolling_date_begin, rolling_date_end, training_period, testing_period, testing_demean_period))
     my_log.info(util.util.dict2str(my_para))
     my_log.info('normalize: {}\nadd_const: {}'.format(normalize, add_const))
     my_log.info('output path: {}'.format(output_path))
@@ -117,7 +118,7 @@ def main():
                 model_selection_result_this_time_period[reg_data_vars_len][tuple(sorted(reg_data_vars_iter.x_var_names))] = predict_result
                 path_ = _get_detail_record_path(var_num=reg_data_vars_len, reg_count=reg_count)
                 util.util.record_result(
-                    to_record_str=reg_data_vars_iter.result_record_str() + reg_data_testing_vars_iter.result_record_str(),
+                    to_record_str=reg_data_vars_iter.result_record_str() + '\n' + reg_data_testing_vars_iter.result_record_str(),
                     to_record_path=path_
                 )
 
@@ -175,15 +176,17 @@ def check_valid2(model_selection_result_this_time_period, reg_data_vars_len):  #
     else:
         return True
 
-
 if __name__ == '__main__':
     import cProfile
-
-    cProfile.run('main()')
+    cprofile_path = output_path + 'cProfile'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    cProfile.run('main()', cprofile_path)
 
     import pstats
 
-    p = pstats.Stats('restats')
+    p = pstats.Stats(cprofile_path)
+    p.sort_stats('cumulative').print_stats()
 
 
 

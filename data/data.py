@@ -174,7 +174,8 @@ class DataBase:
 
         if type_ == 'training':
             if normalize:
-                x_series_normalize_func = lambda x_: pd.DataFrame([(x_[col] - x_series_drop_na[col].mean())/x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in x_]).T
+                x_series_normalize_func = lambda x_: pd.DataFrame(
+                    [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in x_ if x_series_drop_na[col].std() != 0]).T
                 y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x

@@ -5,16 +5,17 @@ Created on 2016/8/30 10:10
 @author: qiding
 """
 
-import os
-import pandas as pd
-import numpy as np
 import datetime
-
-import util.util
-import my_path.path
-import log.log
-import data.reg_data
+import os
 import re
+
+import numpy as np
+import pandas as pd
+
+import data.reg_data
+import log.log
+import my_path.path
+import util.util
 
 my_log = log.log.log_order_flow_predict
 
@@ -36,11 +37,11 @@ class DataBase:
                     self.data_df[var_moving_average] = self._get_one_col(var_moving_average)
             else:
                 self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
-            # if 'buy_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_5min_intraday_pattern_20_days' in self.para_dict['x_vars']:
+                # if 'buy_vol_10min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_10min_intraday_pattern_20_days' in self.para_dict['x_vars']:
             #     self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
             #
             #     # pre-treat intraday_pattern
-            #     for col in ['buy_vol_5min_intraday_pattern_20_days', 'sell_vol_5min_intraday_pattern_20_days']:
+                #     for col in ['buy_vol_10min_intraday_pattern_20_days', 'sell_vol_10min_intraday_pattern_20_days']:
             #         if col in self.para_dict['x_vars']:
             #             self.data_df[col] = self._get_one_col(col)
             # else:
@@ -50,8 +51,13 @@ class DataBase:
             self.date_begin = data_df.index[0]
             self.date_end = data_df.index[-1]
             self.data_df = data_df
-        self.x_names = self.para_dict['x_vars'] if x_names is None else x_names
-        self.y_names = self.para_dict['y_vars'] if y_names is None else y_names
+            # self.x_names = x_names
+            # self.x_names = (
+            #     self.para_dict['x_vars'] +
+            #     (self.para_dict['x_vars_moving_average'] if 'x_vars_moving_average' in self.para_dict.keys() else []) +
+            #     (util.util.high_order_name_change(self.para_dict['high_order2_term_x']) if 'high_order2_term_x' in self.para_dict.keys() else [])
+            # ) if x_names is None else x_names
+            # self.y_names = y_names
 
     def generate_reg_data(self, normalize_funcs=None, normalize=True):
 
@@ -119,7 +125,10 @@ class DataBase:
         window_y = util.util.get_windows(time_scale_long=time_scale_y, time_scale_short=time_scale_now)
         assert window_y >= window_x
 
-        contemporaneous_cols = [col_ for col_ in ['buy_vol_5min_intraday_pattern_20_days', 'sell_vol_5min_intraday_pattern_20_days'] if col_ in x_vars.columns]
+        if 'x_vars_moving_average' in self.para_dict.keys():
+            contemporaneous_cols = self.para_dict['x_vars_moving_average']
+        else:
+            contemporaneous_cols = [col_ for col_ in ['buy_vol_10min_intraday_pattern_20_days', 'sell_vol_10min_intraday_pattern_20_days'] if col_ in x_vars.columns]
         non_contemp_cols = [col_ for col_ in x_vars.columns if col_ not in contemporaneous_cols]
 
         x_vars_not_contemp = x_vars[non_contemp_cols]
@@ -191,7 +200,7 @@ class DataBase:
         x_vars_name_raw = self.para_dict['x_vars']
         if 'high_order2_term_x' in self.para_dict.keys():
             x_vars_name_high_order2_ = self.para_dict['high_order2_term_x']
-            x_vars_name_high_order2 = [x_var_ + '_order2' for x_var_ in x_vars_name_high_order2_]
+            x_vars_name_high_order2 = util.util.high_order_name_change(x_vars_name_high_order2_, 2)
             x_vars_name = x_vars_name_raw + x_vars_name_high_order2
         else:
             x_vars_name = x_vars_name_raw
@@ -218,8 +227,6 @@ class DataBase:
         return data_freq
 
     def _get_data_cols(self, vars_name):
-        # ['bsize1', 'asize1', 'spread', 'mid_px_ret_15s', 'sellvolume', 'buyvolume', 'volume_index_sh50', 'volume_index_hs300', 'ret_sh50_15s', 'ret_hs300_15s', 'bid1_ret_15s', 'ask1_ret_15s', 'totalamout'],
-
         data_list = []
         for var_name in vars_name:
             data_list.append(self._get_one_col(var_name))
@@ -227,6 +234,7 @@ class DataBase:
         return data_df
 
     def _get_one_col(self, var_name):
+        my_log.debug(var_name)
         data_raw = self.data_df
         time_scale_raw = data_raw.index[1] - data_raw.index[0]
         if var_name in data_raw.columns:
@@ -289,7 +297,7 @@ class DataBase:
             data_new = data_raw['bsize1'] - data_raw['bsize1'].shift(1)
         elif var_name == 'asize1_change':
             data_new = data_raw['asize1'] - data_raw['asize1'].shift(1)
-        elif var_name == 'buy_vol_5min_intraday_pattern_20_days':
+        elif var_name == 'buy_vol_10min_intraday_pattern_20_days':
             data_vol = data_raw[['buyvolume']]
             data_vol.loc[:, 'index'] = data_vol.index
             data_vol.loc[:, 'date'] = data_vol['index'].apply(lambda x: (x.year, x.month, x.day))
@@ -303,7 +311,7 @@ class DataBase:
             vol_long = vol_wide_rolling_mean.stack()
 
             data_new = pd.DataFrame(vol_long[data_vol['new_index']]).set_index(data_vol.index)[0]
-        elif var_name == 'sell_vol_5min_intraday_pattern_20_days':
+        elif var_name == 'sell_vol_10min_intraday_pattern_20_days':
             data_vol = data_raw[['sellvolume']]
             data_vol.loc[:, 'index'] = data_vol.index
             data_vol.loc[:, 'date'] = data_vol['index'].apply(lambda x: (x.year, x.month, x.day))
@@ -324,7 +332,7 @@ class DataBase:
             'volume_index300_mean5days', 'volume_index300_mean20days', 'volume_index300_mean1day',
         ]:
             var_name_prefix = '_'.join(var_name.split('_')[:-1])
-            ma_days = int(re.search('(?<=mean)\d+(?=day)',var_name).group())
+            ma_days = int(re.search('(?<=mean)\d+(?=day)', var_name).group())
             data_col = data_raw[[var_name_prefix]]
             data_col.loc[:, 'index'] = data_col.index
             data_col.loc[:, 'date'] = data_col['index'].apply(lambda x: (x.year, x.month, x.day))

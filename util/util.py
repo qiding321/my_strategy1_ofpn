@@ -5,8 +5,11 @@ Created on 2016/8/30 10:34
 @author: qiding
 """
 
-import pandas as pd
 import datetime
+
+import pandas as pd
+
+import log.log
 import util.const as const
 
 
@@ -35,15 +38,29 @@ def is_in_market_open_time(time):
     return b
 
 
+################# too time consuming
+# def in_intraday_period(time, time_period='10min'):
+#     time_ = datetime.datetime(1900, 1, 1, hour=time.hour, minute=time.minute, second=time.second)
+#     seconds = get_seconds(end_time=time_)
+#     td0 = datetime.timedelta(seconds=seconds)
+#     td1 = pd.datetools.to_offset(time_period).delta
+#     try:
+#         period = int(td0 / td1)
+#     except ZeroDivisionError:
+#         period = 0
+#     return period
+
 def in_intraday_period(time, time_period='10min'):
     time_ = datetime.datetime(1900, 1, 1, hour=time.hour, minute=time.minute, second=time.second)
     seconds = get_seconds(end_time=time_)
-    td0 = datetime.timedelta(seconds=seconds)
-    td1 = pd.datetools.to_offset(time_period).delta
-    try:
-        period = int(td0 / td1)
-    except ZeroDivisionError:
-        period = 0
+    # td0 = datetime.timedelta(seconds=seconds)
+    # td1 = datetime.timedelta(seconds=600)
+    if time_period == '10min':
+        time_period_seconds = 600
+    else:
+        log.log.log_price_predict.error('time_period_error: {}'.format(time_period))
+        raise ValueError
+    period = int(seconds / time_period_seconds)
     return period
 
 
@@ -89,3 +106,8 @@ def get_timenow_str():
     now = datetime.datetime.now()
     now_str = now.strftime('%Y-%m-%d-%H-%M-%S')
     return now_str
+
+
+def high_order_name_change(name_list, order=2):
+    r = [x_var_ + '_order2' for x_var_ in name_list]
+    return r

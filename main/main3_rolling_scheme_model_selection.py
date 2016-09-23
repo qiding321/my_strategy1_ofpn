@@ -5,16 +5,17 @@ Created on 2016/9/16 15:24
 @author: qiding
 """
 
-import log.log
-import paras.paras
-import data.data
-import data.reg_data
-import util.const
-import util.util
-import my_path.path
+import os
 
 import pandas as pd
-import os
+
+import data.data
+import data.reg_data
+import log.log
+import my_path.path
+import paras.paras
+import util.const
+import util.util
 
 
 def main():
@@ -65,6 +66,11 @@ def main():
 
     # ============================rolling==========================
     model_selection_result = dict()
+
+    def _get_detail_record_path(var_num, reg_count):
+        this_path_ = '{output_path}detail\\var_num_{var_num}\\{reg_count}'.format(output_path=output_path, var_num=var_num, reg_count=reg_count)
+        return this_path_
+
     for data_rolling_once in data_rolling.generating_rolling_data():
         # ============================normalize data=================
         data_training, data_predicting, data_demean, in_sample_period, out_of_sample_period = [
@@ -92,7 +98,7 @@ def main():
             else:
                 break
 
-            for reg_data_vars_iter in reg_data_training.vars_iteration_model_selection(vars_left):
+            for reg_count, reg_data_vars_iter in enumerate(reg_data_training.vars_iteration_model_selection(vars_left)):
                 reg_data_vars_len = reg_data_vars_iter.num_of_x_vars
                 assert reg_data_vars_len == num_now - 1
 
@@ -109,6 +115,11 @@ def main():
                 if reg_data_vars_len not in model_selection_result_this_time_period.keys():
                     model_selection_result_this_time_period[reg_data_vars_len] = dict()
                 model_selection_result_this_time_period[reg_data_vars_len][tuple(sorted(reg_data_vars_iter.x_var_names))] = predict_result
+                path_ = _get_detail_record_path(var_num=reg_data_vars_len, reg_count=reg_count)
+                util.util.record_result(
+                    to_record_str=reg_data_vars_iter.result_record_str() + reg_data_testing_vars_iter.result_record_str(),
+                    to_record_path=path_
+                )
 
             vars_left = sorted([(v, k) for k, v in model_selection_result_this_time_period[num_now - 1].items()], key=lambda x: x[0])[-1][1]
 
@@ -164,5 +175,16 @@ def check_valid2(model_selection_result_this_time_period, reg_data_vars_len):  #
     else:
         return True
 
+
 if __name__ == '__main__':
-    main()
+    import cProfile
+
+    cProfile.run('main()')
+
+    import pstats
+
+    p = pstats.Stats('restats')
+
+
+
+    # main()

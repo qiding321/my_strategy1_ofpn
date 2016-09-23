@@ -78,9 +78,10 @@ class Paras:
             'y_vars': ['buyvolume'],
             'high_order2_term_x': [
                 'buyvolume', 'sellvolume', 'bsize1_change', 'asize1_change',
-                'buyvolume_mean5days', 'buyvolume_mean20days', 'buyvolume_mean1days',
-                'volume_index50_mean5days', 'volume_index50_mean20days', 'volume_index50_mean1day',
-                'volume_index300_mean5days', 'volume_index300_mean20days', 'volume_index300_mean1day',
+                'buyvolume_mean5days', 'buyvolume_mean20days', 'buyvolume_mean1day',
+                'sellvolume_mean5days', 'sellvolume_mean20days', 'sellvolume_mean1day',
+                'volume_index_sh50_mean5days', 'volume_index_sh50_mean20days', 'volume_index_sh50_mean1day',
+                'volume_index_hs300_mean5days', 'volume_index_hs300_mean20days', 'volume_index_hs300_mean1day',
             ],
             'add_const': True,
             # 'add_const': False,

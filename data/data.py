@@ -198,12 +198,17 @@ class DataBase:
         y_vars = self._get_vars(y_vars_name, time_freq)
 
         x_vars_name_raw = self.para_dict['x_vars']
+
+        if 'x_vars_moving_average' in self.para_dict.keys():
+            x_vars_name_raw1 = x_vars_name_raw + self.para_dict['x_vars_moving_average']
+        else:
+            x_vars_name_raw1 = x_vars_name_raw
         if 'high_order2_term_x' in self.para_dict.keys():
             x_vars_name_high_order2_ = self.para_dict['high_order2_term_x']
             x_vars_name_high_order2 = util.util.high_order_name_change(x_vars_name_high_order2_, 2)
-            x_vars_name = x_vars_name_raw + x_vars_name_high_order2
+            x_vars_name = x_vars_name_raw1 + x_vars_name_high_order2
         else:
-            x_vars_name = x_vars_name_raw
+            x_vars_name = x_vars_name_raw1
 
         x_vars = self._get_vars(x_vars_name, time_freq)
 
@@ -234,7 +239,7 @@ class DataBase:
         return data_df
 
     def _get_one_col(self, var_name):
-        my_log.debug(var_name)
+        my_log.info(var_name)
         data_raw = self.data_df
         time_scale_raw = data_raw.index[1] - data_raw.index[0]
         if var_name in data_raw.columns:
@@ -302,7 +307,6 @@ class DataBase:
             data_vol.loc[:, 'index'] = data_vol.index
             data_vol.loc[:, 'date'] = data_vol['index'].apply(lambda x: (x.year, x.month, x.day))
             data_vol.loc[:, 'period'] = data_vol['index'].apply(util.util.in_intraday_period)
-
             data_vol['new_index'] = list(zip(data_vol['date'], data_vol['period']))
 
             vol_mean_by_date_and_period = data_vol.groupby(['date', 'period'])['buyvolume'].mean()
@@ -328,8 +332,8 @@ class DataBase:
         elif var_name in [
             'buyvolume_mean5days', 'buyvolume_mean20days', 'buyvolume_mean1day',
             'sellvolume_mean5days', 'sellvolume_mean20days', 'sellvolume_mean1day',
-            'volume_index50_mean5days', 'volume_index50_mean20days', 'volume_index50_mean1day',
-            'volume_index300_mean5days', 'volume_index300_mean20days', 'volume_index300_mean1day',
+            'volume_index_sh50_mean5days', 'volume_index_sh50_mean20days', 'volume_index_sh50_mean1day',
+            'volume_index_hs300_mean5days', 'volume_index_hs300_mean20days', 'volume_index_hs300_mean1day',
         ]:
             var_name_prefix = '_'.join(var_name.split('_')[:-1])
             ma_days = int(re.search('(?<=mean)\d+(?=day)', var_name).group())
@@ -347,7 +351,9 @@ class DataBase:
         elif var_name.endswith('_order2'):  # todo
             var_name_prefix = var_name[:-7]
             data_new_ = self._get_one_col(var_name_prefix)
-            data_new = data_new_.values * data_new_.values
+            # data_new = data_new_.values * data_new_.values
+            # data_new = pd.DataFrame(data_new, index=data_new_.index)
+            data_new = data_new_ * data_new_
         else:
             my_log.error(var_name)
             raise LookupError
@@ -441,26 +447,28 @@ class DataRolling(DataBase):
                 demean_date_end = predict_date_begin - offset_one_day
 
             if training_date_begin < date_begin or demean_date_begin < date_begin:
-                continue
+                pass
+            else:
+                if predict_date_end > date_end or training_date_end > date_end:
+                    raise StopIteration
 
-            if predict_date_end > date_end or training_date_end > date_end:
-                raise StopIteration
+                my_log.info('rolling: {}, {}, {}, {}'.format(training_date_begin, training_date_end, predict_date_begin, predict_date_end))
 
-            data_training_df = my_data.select(lambda x: training_date_end >= x >= training_date_begin)
-            data_predicting_df = my_data.select(lambda x: predict_date_end >= x >= predict_date_begin)
-            data_out_of_sample_demean_df = my_data.select(lambda x: demean_date_end >= x >= demean_date_begin)
+                data_training_df = my_data.select(lambda x: training_date_end >= x >= training_date_begin)
+                data_predicting_df = my_data.select(lambda x: predict_date_end >= x >= predict_date_begin)
+                data_out_of_sample_demean_df = my_data.select(lambda x: demean_date_end >= x >= demean_date_begin)
 
-            data_training = TrainingData(data_df=data_training_df, have_data_df=True, para_dict=self.para_dict)
-            data_predicting = TestingData(data_df=data_predicting_df, have_data_df=True, para_dict=self.para_dict)
-            data_out_of_sample_demean = TrainingData(data_df=data_out_of_sample_demean_df, have_data_df=True, para_dict=self.para_dict)
+                data_training = TrainingData(data_df=data_training_df, have_data_df=True, para_dict=self.para_dict)
+                data_predicting = TestingData(data_df=data_predicting_df, have_data_df=True, para_dict=self.para_dict)
+                data_out_of_sample_demean = TrainingData(data_df=data_out_of_sample_demean_df, have_data_df=True, para_dict=self.para_dict)
 
-            in_sample_period = ''.join([training_date_begin.strftime('%Y%m%d'), '_', training_date_end.strftime('%Y%m%d')])
-            out_of_sample_period = ''.join([predict_date_begin.strftime('%Y%m%d'), '_', predict_date_end.strftime('%Y%m%d')])
-            demean_period = ''.join([demean_date_begin.strftime('%Y%m%d'), '_', demean_date_end.strftime('%Y%m%d')])
+                in_sample_period = ''.join([training_date_begin.strftime('%Y%m%d'), '_', training_date_end.strftime('%Y%m%d')])
+                out_of_sample_period = ''.join([predict_date_begin.strftime('%Y%m%d'), '_', predict_date_end.strftime('%Y%m%d')])
+                demean_period = ''.join([demean_date_begin.strftime('%Y%m%d'), '_', demean_date_end.strftime('%Y%m%d')])
 
-            to_yield = dict(list(zip(keys, [data_training, data_predicting, data_out_of_sample_demean, in_sample_period, out_of_sample_period, demean_period])))
+                to_yield = dict(list(zip(keys, [data_training, data_predicting, data_out_of_sample_demean, in_sample_period, out_of_sample_period, demean_period])))
 
-            my_log.info('data_training: {}\ndata_predicting: {}\ndemean_period: {}'.format(in_sample_period, out_of_sample_period, demean_date_end))
+                my_log.info('data_training: {}\ndata_predicting: {}\ndemean_period: {}'.format(in_sample_period, out_of_sample_period, demean_date_end))
 
-            yield to_yield
+                yield to_yield
             date_moving = date_moving + offset_predict

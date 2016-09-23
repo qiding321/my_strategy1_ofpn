@@ -5,10 +5,13 @@ Created on 2016/9/16 16:43
 @author: qiding
 """
 
-import statsmodels.api as sm
 import os
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+
+import util.util
 
 
 class RegDataTraining:
@@ -35,6 +38,16 @@ class RegDataTraining:
             y_vars = self.y_vars
             reg_data_new = RegDataTraining(x_vars=x_vars, y_vars=y_vars)
             yield reg_data_new
+
+    def result_record_str(self):
+        coef = self.paras.params
+        tvalues = self.paras.tvalues
+        df = pd.concat([coef, tvalues], keys=['coef', 'tvalues'], axis=1).T
+        to_ret = util.util.pandas2str(df, title='data_training_result')
+
+        to_ret += '\n\nrsquared: {}'.format(self.paras.rsquared)
+
+        return to_ret
 
 
 class RegDataTest:
@@ -94,6 +107,19 @@ class RegDataTest:
         }
 
         return ret
+
+    def result_record_str(self):
+        err_dict = self.get_err()
+        mse = err_dict['sse']
+        msr = err_dict['ssr']
+
+        to_ret_str = '\n'
+        title = 'data_testing_result'
+
+        to_ret_str += title
+        to_ret_str += 'mse,{}\nmsr,{}'.format(mse, msr)
+
+        return to_ret_str
 
     def generate_vars_model_selection(self, x_var_names):
         x_vars = self.x_vars[x_var_names]

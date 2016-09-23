@@ -36,7 +36,7 @@ output_path = my_path.path.market_making_result_root + time_now_str + descriptio
 def main():
 
     # ==========================date=============================
-    rolling_date_begin = '20131101'
+    rolling_date_begin = '20131001'
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
 
@@ -53,6 +53,7 @@ def main():
 
     # =========================log================================
     my_log = log.log.log_order_flow_predict
+    my_log.add_path(log_path2=output_path + 'log.log')
     my_log.info('description: %s' % description)
     my_log.info('rolling_date_begin: {}\nrolling_date_end: {}\ntraining period: {}\ntesting period: {}\ndemean period: {}'
                 .format(rolling_date_begin, rolling_date_end, training_period, testing_period, testing_demean_period))
@@ -68,8 +69,9 @@ def main():
     # ============================rolling==========================
     model_selection_result = dict()
 
-    def _get_detail_record_path(var_num, reg_count):
-        this_path_ = '{output_path}detail\\var_num_{var_num}\\{reg_count}\\'.format(output_path=output_path, var_num=var_num, reg_count=reg_count)
+    def _get_detail_record_path(var_num, reg_count, test_sample_period):
+        this_path_ = '{output_path}detail\\{test_sample_period}\\var_num_{var_num}\\{reg_count}\\'.format(output_path=output_path, var_num=var_num, reg_count=reg_count,
+                                                                                                          test_sample_period=test_sample_period)
         return this_path_
 
     for data_rolling_once in data_rolling.generating_rolling_data():
@@ -116,7 +118,7 @@ def main():
                 if reg_data_vars_len not in model_selection_result_this_time_period.keys():
                     model_selection_result_this_time_period[reg_data_vars_len] = dict()
                 model_selection_result_this_time_period[reg_data_vars_len][tuple(sorted(reg_data_vars_iter.x_var_names))] = predict_result
-                path_ = _get_detail_record_path(var_num=reg_data_vars_len, reg_count=reg_count)
+                path_ = _get_detail_record_path(var_num=reg_data_vars_len, reg_count=reg_count, test_sample_period=out_of_sample_period)
                 util.util.record_result(
                     to_record_str=reg_data_vars_iter.result_record_str() + '\n' + reg_data_testing_vars_iter.result_record_str(),
                     to_record_path=path_

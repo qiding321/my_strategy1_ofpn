@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="44f7a7b0-6c80-4eb6-a25e-fdc81f19f9f4" name="Default" comment="now seems no bug, add moving average and higher orders">
+    <list default="true" id="44f7a7b0-6c80-4eb6-a25e-fdc81f19f9f4" name="Default" comment="temp change, don't mind">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/log/log.py" afterPath="$PROJECT_DIR$/log/log.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py" afterPath="$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py" />
     </list>
     <list id="da8f5551-4c1c-4b8d-9a8d-d9d165f101dd" name="Rejected commit: Default" comment="add time consuming function, fix some bug and record detail" />
@@ -28,10 +29,23 @@
       <file leaf-file-name="main3_rolling_scheme_model_selection.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.18612522">
-              <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.55837566">
+              <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding>
-                <element signature="e#2699#2863#0" expanded="true" />
+                <element signature="e#2772#2997#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="log.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/log/log.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
+              <folding>
+                <element signature="e#254#1155#0" expanded="true" />
+                <element signature="e#1200#1473#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -41,27 +55,10 @@
         <entry file="file://$PROJECT_DIR$/data/data.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+              <caret line="19" column="4" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="4" />
               <folding>
-                <marker date="1474621730746" expanded="false" signature="24:75" placeholder="&quot;&quot;&quot;Created on 2016/8/30 10:10...&quot;&quot;&quot;" />
-                <marker date="1474621730746" expanded="true" signature="77:226" placeholder="import ..." />
-                <marker date="1474621730746" expanded="true" signature="285:19866" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="415:2728" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="2800:4301" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="4376:4912" placeholder="..." />
-                <marker date="1474621730746" expanded="false" signature="5005:5980" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="6133:10088" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="10123:11446" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="11494:11966" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="12008:12224" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="12263:19174" placeholder="..." />
-                <marker date="1474621730746" expanded="false" signature="19257:19866" placeholder="..." />
-                <marker date="1474621730746" expanded="false" signature="19285:19390" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="19898:19907" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="19938:19947" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="19978:25209" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="20096:20309" placeholder="..." />
-                <marker date="1474621730746" expanded="true" signature="20362:25209" placeholder="..." />
+                <element signature="e#4385#4912#0" expanded="true" />
+                <element signature="e#12272#19174#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -90,16 +87,6 @@
                 <element signature="e#3185#3246#0" expanded="true" />
                 <element signature="e#3303#3491#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="const.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/util/const.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -154,16 +141,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main1_one_reg_predict.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main/main1_one_reg_predict.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="40" column="29" selection-start-line="40" selection-start-column="29" selection-end-line="40" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="paras.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/paras/paras.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -206,7 +183,6 @@
         <option value="$PROJECT_DIR$/main/main1_one_reg_predict.py" />
         <option value="$PROJECT_DIR$/main/main3_rolling_sceme_model_selection.py" />
         <option value="$PROJECT_DIR$/main/main2_rolling_sceme.py" />
-        <option value="$PROJECT_DIR$/log/log.py" />
         <option value="$PROJECT_DIR$/main/main00_model_selection_analysis.py" />
         <option value="$PROJECT_DIR$/main/main01_model_selection_analysis_3vars.py" />
         <option value="$PROJECT_DIR$/my_path/path.py" />
@@ -215,6 +191,7 @@
         <option value="$PROJECT_DIR$/data/data.py" />
         <option value="$PROJECT_DIR$/util/util.py" />
         <option value="$PROJECT_DIR$/data/reg_data.py" />
+        <option value="$PROJECT_DIR$/log/log.py" />
         <option value="$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py" />
       </list>
     </option>
@@ -770,15 +747,22 @@
       <option name="project" value="LOCAL" />
       <updated>1474611208715</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="temp change, don't mind">
+      <created>1474622261778</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1474622261778</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21232876" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286334" sideWeight="0.5021075" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2654388" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2340195" sideWeight="0.49789253" order="0" side_tool="false" content_ui="tabs" />
@@ -786,9 +770,8 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32827735" sideWeight="0.49789253" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32827735" sideWeight="0.49789253" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -836,7 +819,8 @@
     <MESSAGE value="check ma, high order terms" />
     <MESSAGE value="add time consuming function, fix some bug and record detail" />
     <MESSAGE value="now seems no bug, add moving average and higher orders" />
-    <option name="LAST_COMMIT_MESSAGE" value="now seems no bug, add moving average and higher orders" />
+    <MESSAGE value="temp change, don't mind" />
+    <option name="LAST_COMMIT_MESSAGE" value="temp change, don't mind" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -881,7 +865,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py</url>
-          <line>120</line>
+          <line>121</line>
           <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -891,13 +875,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py</url>
-          <line>118</line>
+          <line>119</line>
           <option name="timeStamp" value="74" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py</url>
-          <line>76</line>
+          <line>77</line>
           <option name="timeStamp" value="80" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py</url>
+          <line>111</line>
+          <option name="timeStamp" value="81" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -907,19 +896,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="81" />
+      <option name="time" value="82" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/main/main0_raw_data_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="81" column="32" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -988,7 +969,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="32" column="65" selection-start-line="32" selection-start-column="65" selection-end-line="32" selection-end-column="65" />
           <folding>
-            <element signature="e#2699#2863#0" expanded="true" />
+            <element signature="e#2772#2997#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1066,7 +1047,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
           <folding>
-            <element signature="e#2699#2863#0" expanded="true" />
+            <element signature="e#2772#2997#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1136,7 +1117,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
           <folding>
-            <element signature="e#2699#2863#0" expanded="true" />
+            <element signature="e#2772#2997#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1243,13 +1224,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/log/log.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/util/const.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1286,34 +1260,6 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="16" column="4" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-          <folding>
-            <marker date="1474621730746" expanded="false" signature="24:75" placeholder="&quot;&quot;&quot;Created on 2016/8/30 10:10...&quot;&quot;&quot;" />
-            <marker date="1474621730746" expanded="true" signature="77:226" placeholder="import ..." />
-            <marker date="1474621730746" expanded="true" signature="285:19866" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="415:2728" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="2800:4301" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="4376:4912" placeholder="..." />
-            <marker date="1474621730746" expanded="false" signature="5005:5980" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="6133:10088" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="10123:11446" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="11494:11966" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="12008:12224" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="12263:19174" placeholder="..." />
-            <marker date="1474621730746" expanded="false" signature="19257:19866" placeholder="..." />
-            <marker date="1474621730746" expanded="false" signature="19285:19390" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="19898:19907" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="19938:19947" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="19978:25209" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="20096:20309" placeholder="..." />
-            <marker date="1474621730746" expanded="true" signature="20362:25209" placeholder="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1376,12 +1322,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://D:/Program Files (x86)/Anaconda3/Lib/logging/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42978004">
+          <caret line="1036" column="0" selection-start-line="1036" selection-start-column="0" selection-end-line="1036" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="4" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="4" />
+          <folding>
+            <element signature="e#4385#4912#0" expanded="true" />
+            <element signature="e#12272#19174#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/log.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
+          <folding>
+            <element signature="e#254#1155#0" expanded="true" />
+            <element signature="e#1200#1473#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main/main3_rolling_scheme_model_selection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18612522">
-          <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.55837566">
+          <caret line="62" column="0" selection-start-line="62" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
           <folding>
-            <element signature="e#2699#2863#0" expanded="true" />
+            <element signature="e#2772#2997#0" expanded="true" />
           </folding>
         </state>
       </provider>

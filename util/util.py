@@ -6,6 +6,7 @@ Created on 2016/8/30 10:34
 """
 
 import datetime
+import os
 
 import pandas as pd
 
@@ -111,3 +112,12 @@ def get_timenow_str():
 def high_order_name_change(name_list, order=2):
     r = [x_var_ + '_order2' for x_var_ in name_list]
     return r
+
+
+def record_result(to_record_str, to_record_path):
+    if os.path.exists(to_record_path):
+        pass
+    else:
+        os.makedirs(to_record_path)
+    with open(to_record_path + 'result.csv', 'a') as f_out:
+        f_out.write(to_record_str)

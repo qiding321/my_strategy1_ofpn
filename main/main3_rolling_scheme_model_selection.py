@@ -68,7 +68,7 @@ def main():
     model_selection_result = dict()
 
     def _get_detail_record_path(var_num, reg_count):
-        this_path_ = '{output_path}detail\\var_num_{var_num}\\{reg_count}'.format(output_path=output_path, var_num=var_num, reg_count=reg_count)
+        this_path_ = '{output_path}detail\\var_num_{var_num}\\{reg_count}\\'.format(output_path=output_path, var_num=var_num, reg_count=reg_count)
         return this_path_
 
     for data_rolling_once in data_rolling.generating_rolling_data():

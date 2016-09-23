@@ -239,7 +239,7 @@ class DataBase:
         return data_df
 
     def _get_one_col(self, var_name):
-        my_log.info(var_name)
+        my_log.debug(var_name)
         data_raw = self.data_df
         time_scale_raw = data_raw.index[1] - data_raw.index[0]
         if var_name in data_raw.columns:

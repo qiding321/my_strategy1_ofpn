@@ -43,9 +43,9 @@ class RegDataTraining:
         coef = self.paras.params
         tvalues = self.paras.tvalues
         df = pd.concat([coef, tvalues], keys=['coef', 'tvalues'], axis=1).T
-        to_ret = util.util.pandas2str(df, title='data_training_result')
+        to_ret = util.util.pandas2str(df, title='training_result')
 
-        to_ret += '\n\nrsquared: {}'.format(self.paras.rsquared)
+        to_ret += '\nrsquared,{}'.format(self.paras.rsquared)
 
         return to_ret
 
@@ -112,12 +112,14 @@ class RegDataTest:
         err_dict = self.get_err()
         mse = err_dict['sse']
         msr = err_dict['ssr']
+        rsquared = err_dict['rsquared_out_of_sample']
+        rsquared_by_oos_mean = err_dict['rsquared_out_of_sample_by_oos_mean']
 
         to_ret_str = '\n'
-        title = 'data_testing_result'
-
+        title = 'predicting_result'
         to_ret_str += title
-        to_ret_str += 'mse,{}\nmsr,{}'.format(mse, msr)
+        to_ret_str += '\n'
+        to_ret_str += 'mse,{}\nmsr,{}\nrsquared,{}\nrsquared_by_oos_mean,{}'.format(mse, msr, rsquared, rsquared_by_oos_mean)
 
         return to_ret_str
 

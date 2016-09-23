@@ -87,7 +87,6 @@ def drop_na_for_x_and_y(x, y):
 
 def pandas2str(df, title=''):
     s = ''
-    s += '\n'
     s += title + '\n'
     s += ','
     s += ','.join([str(s_) for s_ in df.columns])

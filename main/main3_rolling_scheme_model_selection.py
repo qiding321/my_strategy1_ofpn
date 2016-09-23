@@ -23,9 +23,9 @@ import util.util
 # description = 'rolling_model_selection_one_month_predict_one_month_normalized_by_one_month_add_ma_add_high_order'
 
 # training_period = '12M'
-training_period = '12M'
+training_period = '1M'
 testing_period = '1M'
-testing_demean_period = '12M'
+testing_demean_period = '1M'
 description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
@@ -36,7 +36,7 @@ output_path = my_path.path.market_making_result_root + time_now_str + descriptio
 def main():
 
     # ==========================date=============================
-    rolling_date_begin = '20130801'
+    rolling_date_begin = '20131101'
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
 

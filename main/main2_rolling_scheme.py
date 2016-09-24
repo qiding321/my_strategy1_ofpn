@@ -5,6 +5,8 @@ Created on 2016/9/16 15:24
 @author: qiding
 """
 
+import os
+
 import data.data
 import data.reg_data
 import log.log
@@ -12,6 +14,27 @@ import my_path.path
 import paras.paras
 import util.const
 import util.util
+
+# ==========================description=======================
+# description = 'rolling_new_one_year_not_normalized_neat_buy'  # todo
+# description = 'rolling_one_year_normalized_neat_buy'  # todo
+# description = 'rolling_new_one_year_not_normalized_buy'  # todo
+# description = 'rolling_one_year_normalized_buy_68vars_add_const'  # todo
+# description = 'rolling_one_year_normalized_buy_68vars_not_add_const'  # todo
+# description = 'rolling_one_year_normalized_buy_selected_vars'  # todo
+# description = 'test'  # todo
+
+training_period = '1M'
+testing_period = '1M'
+testing_demean_period = '12M'
+normalize = True
+# normalize = False
+# description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma'.format(training_period, testing_period, testing_demean_period)
+
+# ==========================output path======================
+time_now_str = util.util.get_timenow_str()
+output_path = my_path.path.market_making_result_root + time_now_str + description + '\\'
 
 
 def main():
@@ -21,38 +44,21 @@ def main():
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
 
-    # ==========================description=======================
-    # description = 'rolling_new_one_year_not_normalized_neat_buy'  # todo
-    # description = 'rolling_one_year_normalized_neat_buy'  # todo
-    # description = 'rolling_new_one_year_not_normalized_buy'  # todo
-    # description = 'rolling_one_year_normalized_buy_68vars_add_const'  # todo
-    # description = 'rolling_one_year_normalized_buy_68vars_not_add_const'  # todo
-    # description = 'rolling_one_year_normalized_buy_selected_vars'  # todo
-    # description = 'test'  # todo
-    description = 'rolling_one_month_demean_one_year_normalized_buy_add_ma_and_high_order'
-    training_period = '1M'
-    testing_period = '1M'
-    testing_demean_period = '12M'
-    normalize = True
-    # normalize = False
-
     # ==========================paras============================
-    # my_para = paras.paras.Paras().paras1  # todo
-    my_para = paras.paras.Paras().paras1_high_order  # todo
+    my_para = paras.paras.Paras().paras1  # todo
+    # my_para = paras.paras.Paras().paras1_high_order  # todo
     # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
 
-    # ==========================output path======================
-    time_now_str = util.util.get_timenow_str()
-    output_path = my_path.path.market_making_result_root + time_now_str + description + '\\'
-
     # =========================log================================
     my_log = log.log.log_order_flow_predict
+    my_log.add_path(log_path2=output_path + 'log.log')
     my_log.info('description: %s' % description)
-    my_log.info('rolling_date_begin: {}\nrolling_date_end: {}\ntraining period: {}\ntesting period: {}'
-                .format(rolling_date_begin, rolling_date_end, training_period, testing_period))
+    my_log.info('rolling_date_begin: {}\nrolling_date_end: {}\ntraining period: {}\ntesting period: {}\ndemean period: {}'
+                .format(rolling_date_begin, rolling_date_end, training_period, testing_period, testing_demean_period))
     my_log.info(util.util.dict2str(my_para))
+    my_log.info('normalize: {}\nadd_const: {}'.format(normalize, add_const))
     my_log.info('output path: {}'.format(output_path))
 
     # ============================loading data====================
@@ -89,11 +95,15 @@ def main():
 if __name__ == '__main__':
     import cProfile
 
-    cProfile.run('main()', my_path.path.cprofile_path)
+    cprofile_path = output_path + 'cProfile'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    cProfile.run('main()', cprofile_path)
 
     import pstats
 
-    p = pstats.Stats(my_path.path.cprofile_path)
+    p = pstats.Stats(cprofile_path)
     p.sort_stats('cumulative').print_stats()
+
 
     # main()

@@ -9,7 +9,7 @@ Created on 2016/9/19 9:17
 import os
 import pandas as pd
 
-file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\rolling_model_selection_one_year_buy_all_vars2016-09-20-16-54-45\\'
+file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-23-14-57-18rolling_model_selection_12M_predict_1M_normalized_by_12M_add_ma_add_high_order\\'
 file_name = 'result_best.csv'
 output_name = 'var_categories.txt'
 
@@ -26,7 +26,7 @@ def clean_one_name(one_name):
 
 data_raw = pd.read_csv(file_path + file_name)
 vars_list = list(data_raw['var_names'])
-vars_new = [[clean_one_name(var) for var in vars_.split(',')] for vars_ in vars_list]
+vars_new = [[clean_one_name(var) for var in vars_.split(',') if len(clean_one_name(var))!=0] for vars_ in vars_list]
 
 
 categories_list = [
@@ -62,7 +62,7 @@ def categories_map_func(this_name):
             return this_cat
     else:
         print(this_name)
-        # raise LookupError
+        raise LookupError
 
 var_result_record = {}
 cat_record = {}

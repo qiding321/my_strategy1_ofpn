@@ -36,7 +36,7 @@ output_path = my_path.path.market_making_result_root + time_now_str + descriptio
 def main():
 
     # ==========================date=============================
-    rolling_date_begin = '20131001'
+    rolling_date_begin = '20130801'
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
 

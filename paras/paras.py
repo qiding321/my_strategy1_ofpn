@@ -28,7 +28,6 @@ class Paras:
                 'bsize1_change', 'asize1_change',
                 # 'volatility_index300_60s', 'volatility_mid_px_60s',
                 'volatility_index300_60s', 'volatility_index50_60s', 'volatility_mid_px_60s',
-                'buy_vol_10min_intraday_pattern_20_days', 'sell_vol_10min_intraday_pattern_20_days',
                 'ret_index_index_future_300', 'volume_index_index_future_300',
                 ],
             'x_vars_moving_average': [

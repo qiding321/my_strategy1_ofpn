@@ -175,7 +175,30 @@ class DataBase:
         if type_ == 'training':
             if normalize:
                 x_series_normalize_func = lambda x_: pd.DataFrame(
-                    [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in x_ if x_series_drop_na[col].std() != 0]).T
+                    [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                ).T
+                # def x_series_normalize_func(x_):
+                #     col_name__list = x_.columns
+                #     col_list = []
+                #     for col in col_name__list:
+                #         try:
+                #             if x_series_drop_na[col].std() != 0:
+                #                 my_log.info(col+'std not 0')
+                #                 col_tmp = (x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col]
+                #                 col_list.append(col_tmp)
+                #             else:
+                #                 my_log.info(col+': std 0')
+                #         except Exception as e:
+                #             my_log.error(e)
+                #             my_log.error(x_.columns)
+                #             my_log.error(x_series_drop_na.columns)
+                #             my_log.error(x_series_drop_na.std())
+                #             raise e
+                #     to_ret = pd.DataFrame(col_list).T
+                #     # to_ret = pd.DataFrame(
+                #     #     [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in x_ if x_series_drop_na[col].std() != 0]
+                #     # ).T
+                #     return to_ret
                 y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x

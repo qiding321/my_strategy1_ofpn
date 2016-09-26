@@ -23,10 +23,11 @@ import util.util
 # description = 'rolling_model_selection_one_month_predict_one_month_normalized_by_one_month_add_ma_add_high_order'
 
 # training_period = '12M'
-training_period = '1M'
+training_period = '12M'
 testing_period = '1M'
-testing_demean_period = '1M'
-description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
+testing_demean_period = '12M'
+# description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_15min_15min'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()

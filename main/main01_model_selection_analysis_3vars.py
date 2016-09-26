@@ -4,7 +4,7 @@ import pandas as pd
 
 file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-23-14-57-18rolling_model_selection_12M_predict_1M_normalized_by_12M_add_ma_add_high_order\\'
 file_name = 'result_all.csv'
-vars_num = 6
+vars_num = 16
 output_name = 'var_categories_' + str(vars_num) + 'vars.txt'
 output_name2 = 'var_categories_' + str(vars_num) + 'vars.csv'
 output_name3 = 'var_categories_' + str(vars_num) + 'vars_only_categories.csv'

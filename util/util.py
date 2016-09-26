@@ -120,3 +120,18 @@ def record_result(to_record_str, to_record_path):
         os.makedirs(to_record_path)
     with open(to_record_path + 'result.csv', 'a') as f_out:
         f_out.write(to_record_str)
+
+
+def get_offset(time_period):
+    if time_period == '12M':
+        offset = pd.tseries.offsets.MonthEnd(12)
+    elif time_period == '1M':
+        offset = pd.tseries.offsets.MonthEnd(1)
+    elif time_period == '6M':
+        offset = pd.tseries.offsets.MonthEnd(6)
+    elif time_period == '1D':
+        offset = pd.tseries.offsets.Day(1)
+    else:
+        raise ValueError
+
+    return offset

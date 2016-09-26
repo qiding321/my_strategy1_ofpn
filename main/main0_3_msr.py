@@ -1,11 +1,10 @@
-
 import os
+
 import pandas as pd
 
 
 def main():
-
-    fold_path = r'C:\Users\dqi\Documents\Output\MarketMaking\2016-09-25-17-51-04rolling_model_selection_12M_predict_1M_normalized_by_12M_15min_15min\\'
+    fold_path = r'C:\Users\dqi\Documents\Output\MarketMaking\2016-09-25-17-50-52rolling_model_selection_12M_predict_1M_normalized_by_12M_10min_10min\\'
     output_file_name = 'msr_all.csv'
 
     date_list = os.listdir(fold_path + 'detail\\')

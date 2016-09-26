@@ -24,10 +24,10 @@ import util.util
 
 # training_period = '12M'
 training_period = '12M'
-testing_period = '1M'
+testing_period = '1D'
 testing_demean_period = '12M'
 # description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_notstd_15min_1min'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_model_selection_{}_predict_{}_normalized_by_{}_notstd_10min_10min'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()
@@ -35,7 +35,6 @@ output_path = my_path.path.market_making_result_root + time_now_str + descriptio
 
 
 def main():
-
     # ==========================date=============================
     rolling_date_begin = '20130801'
     # training_date_begin = '20150101'
@@ -186,8 +185,10 @@ def check_valid2(model_selection_result_this_time_period, reg_data_vars_len):  #
     else:
         return True
 
+
 if __name__ == '__main__':
     import cProfile
+
     cprofile_path = output_path + 'cProfile'
     if not os.path.exists(output_path):
         os.makedirs(output_path)

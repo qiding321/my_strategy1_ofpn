@@ -5,8 +5,6 @@ Created on 2016/9/19 9:17
 @author: qiding
 """
 
-
-import os
 import pandas as pd
 
 file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-23-14-57-18rolling_model_selection_12M_predict_1M_normalized_by_12M_add_ma_add_high_order\\'

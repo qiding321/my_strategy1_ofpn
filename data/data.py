@@ -174,32 +174,17 @@ class DataBase:
 
         if type_ == 'training':
             if normalize:
+                # normalize modified: divided by std or not
                 x_series_normalize_func = lambda x_: pd.DataFrame(
-                    [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                    [(x_[col] - x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
                 ).T
-                # def x_series_normalize_func(x_):
-                #     col_name__list = x_.columns
-                #     col_list = []
-                #     for col in col_name__list:
-                #         try:
-                #             if x_series_drop_na[col].std() != 0:
-                #                 my_log.info(col+'std not 0')
-                #                 col_tmp = (x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col]
-                #                 col_list.append(col_tmp)
-                #             else:
-                #                 my_log.info(col+': std 0')
-                #         except Exception as e:
-                #             my_log.error(e)
-                #             my_log.error(x_.columns)
-                #             my_log.error(x_series_drop_na.columns)
-                #             my_log.error(x_series_drop_na.std())
-                #             raise e
-                #     to_ret = pd.DataFrame(col_list).T
-                #     # to_ret = pd.DataFrame(
-                #     #     [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in x_ if x_series_drop_na[col].std() != 0]
-                #     # ).T
-                #     return to_ret
-                y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+
+                # divide version
+                # x_series_normalize_func = lambda x_: pd.DataFrame(
+                #     [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                # ).T
+                # y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x
         else:
@@ -417,34 +402,37 @@ class DataRolling(DataBase):
 
     def generating_rolling_data(self, fixed=False):
 
-        if self.training_period == '12M' and self.testing_period == '1M':
-            offset_training = pd.tseries.offsets.MonthEnd(12)  # todo
-            offset_predict = pd.tseries.offsets.MonthEnd(1)
-        elif self.training_period == '18M' and self.testing_period == '1M':
-            offset_training = pd.tseries.offsets.MonthEnd(18)
-            offset_predict = pd.tseries.offsets.MonthEnd(1)
-        elif self.training_period == '6M' and self.testing_period == '1M':
-            offset_training = pd.tseries.offsets.MonthEnd(6)
-            offset_predict = pd.tseries.offsets.MonthEnd(1)
-        elif self.training_period == '1M' and self.testing_period == '1M':
-            offset_training = pd.tseries.offsets.MonthEnd(1)
-            offset_predict = pd.tseries.offsets.MonthEnd(1)
-        else:
-            my_log.error('training_period: ' + self.training_period)
-            my_log.error('testing_period: ' + self.testing_period)
-            raise AssertionError
+        offset_training = util.util.get_offset(self.training_period)
+        offset_predict = util.util.get_offset(self.testing_period)
+        # if self.training_period == '12M' and self.testing_period == '1M':
+        #     offset_training = pd.tseries.offsets.MonthEnd(12)  # todo
+        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
+        # elif self.training_period == '18M' and self.testing_period == '1M':
+        #     offset_training = pd.tseries.offsets.MonthEnd(18)
+        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
+        # elif self.training_period == '6M' and self.testing_period == '1M':
+        #     offset_training = pd.tseries.offsets.MonthEnd(6)
+        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
+        # elif self.training_period == '1M' and self.testing_period == '1M':
+        #     offset_training = pd.tseries.offsets.MonthEnd(1)
+        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
+        # else:
+        #     my_log.error('training_period: ' + self.training_period)
+        #     my_log.error('testing_period: ' + self.testing_period)
+        #     raise AssertionError
 
         if self.test_demean_period is None:
             offset_test_demean = offset_training
         else:
-            if self.test_demean_period == '12M':
-                offset_test_demean = pd.tseries.offsets.MonthEnd(12)
-            elif self.test_demean_period == '1M':
-                offset_test_demean = pd.tseries.offsets.MonthEnd(1)
-            elif self.test_demean_period == '6M':
-                offset_test_demean = pd.tseries.offsets.MonthEnd(6)
-            else:
-                raise ValueError
+            offset_test_demean = util.util.get_offset(self.test_demean_period)
+            # if self.test_demean_period == '12M':
+            #     offset_test_demean = pd.tseries.offsets.MonthEnd(12)
+            # elif self.test_demean_period == '1M':
+            #     offset_test_demean = pd.tseries.offsets.MonthEnd(1)
+            # elif self.test_demean_period == '6M':
+            #     offset_test_demean = pd.tseries.offsets.MonthEnd(6)
+            # else:
+            #     raise ValueError
 
         offset_one_day = pd.tseries.offsets.Day(1)
         keys = ['data_training', 'data_predicting', 'data_out_of_sample_demean', 'in_sample_period', 'out_of_sample_period', 'demean_period']

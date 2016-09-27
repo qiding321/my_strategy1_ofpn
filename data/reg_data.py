@@ -174,7 +174,7 @@ class RegDataTest:
         else:
             data_to_rcd = new_df
 
-        data_to_rcd.to_csv(output_path + file_name)
+        data_to_rcd.sort_index(axis=1).to_csv(output_path + file_name)
 
     def report_monthly(self, output_path, name_time_period, normalize_funcs):
         this_path = output_path + name_time_period + '\\'
@@ -187,23 +187,50 @@ class RegDataTest:
         self._plt_predict_volume(output_path=this_path, normalize_funcs=normalize_funcs)
 
         # daily rsquared and mse and msr
-        self._daily_rsquared_output(output_path=this_path + 'daily_stats.csv')
+        self._daily_rsquared_output(output_path=this_path, normalize_funcs=normalize_funcs)
 
     def _plt_predict_volume(self, output_path, normalize_funcs):
         y_norm_func_rev = normalize_funcs['y_series_normalize_func_reverse']
         y_raw = y_norm_func_rev(self.y_vars).rename(columns={0: 'y_raw'})
-        y_predict = y_norm_func_rev(pd.DataFrame([self.predict_y], index=y_raw.index, columns=['y_predict']))
+        y_predict = y_norm_func_rev(pd.DataFrame([self.predict_y], columns=y_raw.index, index=['y_predict']).T)
 
-        data_merged = pd.merge(y_raw, y_predict, left_index=True, right_index=True)
-        data_merged['ymd'] = data_merged.index.apply(lambda x: (x.year, x.month, x.day))
-        for data_one_day in data_merged.groupby('ymd'):
+        data_merged = pd.merge(y_raw, y_predict, left_index=True, right_index=True).rename(columns={y_raw.columns[0]: 'y_raw', y_predict.columns[0]: 'y_predict'})
+        data_merged['ymd'] = list(map(lambda x: (x.year, x.month, x.day), data_merged.index))
+        for key, data_one_day in data_merged.groupby('ymd'):
             fig = plt.figure()
             plt.plot(data_one_day['y_raw'].values, 'r-')
             plt.plot(data_one_day['y_predict'].values, 'b-')
-            fig.savefig(output_path + 'predict_volume_vs_raw_volume.png')
+            fig.savefig(output_path + 'predict_volume_vs_raw_volume' + str(key) + '.png')
+            plt.close()
+        error_this_month = data_merged['y_raw'] - data_merged['y_predict']
+        plt.hist(error_this_month.values, 100, facecolor='b')
+        plt.axvline(0, color='red')
+        plt.savefig(output_path + 'error_hist.png')
+        plt.close()
 
-    def _daily_rsquared_output(self, output_path, add_const=True):
+        err_des = error_this_month.describe()
+        err_des['skew'] = error_this_month.skew()
+        err_des['kurt'] = error_this_month.kurt()
 
-        data_predict = self.predict_y
-        ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
-        sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
+        err_des.to_csv(output_path + 'err_description.csv')
+
+    def _daily_rsquared_output(self, output_path, normalize_funcs, add_const=True):
+        y_norm_func_rev = normalize_funcs['y_series_normalize_func_reverse']
+        y_raw = y_norm_func_rev(self.y_vars).rename(columns={0: 'y_raw'})
+        y_predict = y_norm_func_rev(pd.DataFrame([self.predict_y], columns=y_raw.index, index=['y_predict']).T)
+
+        data_merged = pd.merge(y_raw, y_predict, left_index=True, right_index=True).rename(columns={y_raw.columns[0]: 'y_raw', y_predict.columns[0]: 'y_predict'})
+        data_merged['ymd'] = list(map(lambda x: (x.year, x.month, x.day), data_merged.index))
+
+        data_merged['error'] = data_merged['y_raw'] - data_merged['y_predict']
+        data_merged['sse'] = data_merged['y_raw'] - self.model.endog.mean()
+
+        def _generate_one_day_stats(c):
+            mse_ = (c['sse'] * c['sse']).sum()
+            msr_ = (c['error'] * c['error']).sum()
+            r_sq_ = 1 - msr_ / mse_
+            ret_ = pd.DataFrame([mse_, msr_, r_sq_], index=['mse', 'msr', 'rsquared']).T
+            return ret_
+
+        r_squared_daily = data_merged.groupby('ymd').apply(_generate_one_day_stats).unstack()
+        r_squared_daily.to_csv(output_path + 'daily_rsquared.csv')

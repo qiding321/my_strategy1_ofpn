@@ -183,7 +183,9 @@ class DataBase:
                 x_series_normalize_func_reverse = lambda x_: pd.DataFrame(
                     [(x_[col] + x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
                 ).T
-                y_series_normalize_func_reverse = lambda y_: pd.DataFrame([(y_[col] + y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+
+                assert len(y_series_drop_na.columns) == 1
+                y_series_normalize_func_reverse = lambda y_: pd.DataFrame([(y_[col] + y_series_drop_na.iloc[:, 0].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
                 # divide version
                 # x_series_normalize_func = lambda x_: pd.DataFrame(

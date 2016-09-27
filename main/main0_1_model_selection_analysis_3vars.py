@@ -2,14 +2,15 @@
 
 import pandas as pd
 
-file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-23-14-57-18rolling_model_selection_12M_predict_1M_normalized_by_12M_add_ma_add_high_order\\'
+file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-25-17-50-52rolling_model_selection_12M_predict_1M_normalized_by_12M_10min_10min\\'
 file_name = 'result_all.csv'
-vars_num = 16
+vars_num = 1
 output_name = 'var_categories_' + str(vars_num) + 'vars.txt'
 output_name2 = 'var_categories_' + str(vars_num) + 'vars.csv'
 output_name3 = 'var_categories_' + str(vars_num) + 'vars_only_categories.csv'
 output_name4 = 'var_categories_' + str(vars_num) + 'vars_only_vars.csv'
 
+print(vars_num)
 
 def clean_one_name(one_name):
     to_del = [' ', '(', ')', '\.', '\'']

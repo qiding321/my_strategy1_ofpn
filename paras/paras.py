@@ -150,22 +150,25 @@ class Paras:
         d = {
             'method': 'test',
             'time_freq': '15s',
-            'time_scale_x': '1min',
-            'time_scale_y': '1min',
+            'time_scale_x': '10min',
+            'time_scale_y': '10min',
             'x_vars': [
-                'bsize2', 'asize2',
+                'asize2',
                 'buyvolume',
+                'sellvolume',
                 'volume_index_sh50',
+                'ret_index_index_future_300',
+                'bsize1_change',
                 ],
             # 'y_vars': ['sellvolume'],
             'y_vars': ['buyvolume'],
             'spread_threshold': (0 * self.min_tick, 100 * self.min_tick),
             'lag_terms': [  # (var_name, [lags])
-                ('buyvolume', [2]),
+                ('buyvolume', [2, 3]),
             ],
-            'high_order2_term_x': [
-                'buyvolume'
-            ],
+            # 'high_order2_term_x': [
+            #     'buyvolume'
+            # ],
 
         }
         return d

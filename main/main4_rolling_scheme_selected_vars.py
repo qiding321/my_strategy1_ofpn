@@ -28,7 +28,7 @@ testing_demean_period = '12M'
 normalize = True
 # normalize = False
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_selected_vars'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_selected_vars_10min'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()

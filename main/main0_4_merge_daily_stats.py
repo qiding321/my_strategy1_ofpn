@@ -12,7 +12,7 @@ import pandas as pd
 import my_path.path
 
 path_root = my_path.path.market_making_result_root
-fold_name = '2016-09-27-12-06-12rolling_error_decomposition_12M_predict_1M_normalized_by_12M_selected_vars'
+fold_name = '2016-09-27-17-57-40rolling_error_decomposition_12M_predict_1M_normalized_by_12M_selected_vars_1min'
 
 dates = [x for x in os.listdir(path_root + fold_name) if len(x.split('.')) == 1]
 predict_date = [x[18:18 + 8] for x in dates]

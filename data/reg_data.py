@@ -7,6 +7,7 @@ Created on 2016/9/16 16:43
 
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -56,16 +57,22 @@ class RegDataTest:
         self.y_vars = y_vars
         self.model = None
         self.paras = None
+        self.predict_y = None
+        self.err_dict = None
 
     def add_model(self, model, paras):
         self.model = model
         self.paras = paras
 
     def predict(self, add_const=True):  # todo
-        if add_const:
-            data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+        if self.predict_y is None:
+            if add_const:
+                data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+            else:
+                data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+            self.predict_y = data_predict
         else:
-            data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+            data_predict = self.predict_y
         ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
         sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
         # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
@@ -76,10 +83,14 @@ class RegDataTest:
 
         y_ = self.y_vars.values
 
-        if add_const:
-            data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+        if self.predict_y is None:
+            if add_const:
+                data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+            else:
+                data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+            self.predict_y = data_predict
         else:
-            data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+            data_predict = self.predict_y
         ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
         sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
         sse_by_oos_mean = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
@@ -106,10 +117,16 @@ class RegDataTest:
             'cov_y_y_predict_multiplied_by_minus_2': cov_y_y_predict_multiplied_by_minus_2,
         }
 
+        self.err_dict = ret
+
         return ret
 
     def result_record_str(self):
-        err_dict = self.get_err()
+        if self.err_dict is None:
+            err_dict = self.get_err()  # todo, note that "add const" is default to be True
+            self.err_dict = err_dict
+        else:
+            err_dict = self.err_dict
         mse = err_dict['sse']
         msr = err_dict['ssr']
         rsquared = err_dict['rsquared_out_of_sample']
@@ -158,3 +175,35 @@ class RegDataTest:
             data_to_rcd = new_df
 
         data_to_rcd.to_csv(output_path + file_name)
+
+    def report_monthly(self, output_path, name_time_period, normalize_funcs):
+        this_path = output_path + name_time_period + '\\'
+        if os.path.exists(this_path):
+            pass
+        else:
+            os.makedirs(this_path)
+
+        # figure
+        self._plt_predict_volume(output_path=this_path, normalize_funcs=normalize_funcs)
+
+        # daily rsquared and mse and msr
+        self._daily_rsquared_output(output_path=this_path + 'daily_stats.csv')
+
+    def _plt_predict_volume(self, output_path, normalize_funcs):
+        y_norm_func_rev = normalize_funcs['y_series_normalize_func_reverse']
+        y_raw = y_norm_func_rev(self.y_vars).rename(columns={0: 'y_raw'})
+        y_predict = y_norm_func_rev(pd.DataFrame([self.predict_y], index=y_raw.index, columns=['y_predict']))
+
+        data_merged = pd.merge(y_raw, y_predict, left_index=True, right_index=True)
+        data_merged['ymd'] = data_merged.index.apply(lambda x: (x.year, x.month, x.day))
+        for data_one_day in data_merged.groupby('ymd'):
+            fig = plt.figure()
+            plt.plot(data_one_day['y_raw'].values, 'r-')
+            plt.plot(data_one_day['y_predict'].values, 'b-')
+            fig.savefig(output_path + 'predict_volume_vs_raw_volume.png')
+
+    def _daily_rsquared_output(self, output_path, add_const=True):
+
+        data_predict = self.predict_y
+        ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
+        sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new

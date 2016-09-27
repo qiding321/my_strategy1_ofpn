@@ -180,6 +180,11 @@ class DataBase:
                 ).T
                 y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
+                x_series_normalize_func_reverse = lambda x_: pd.DataFrame(
+                    [(x_[col] + x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                ).T
+                y_series_normalize_func_reverse = lambda y_: pd.DataFrame([(y_[col] + y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+
                 # divide version
                 # x_series_normalize_func = lambda x_: pd.DataFrame(
                 #     [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
@@ -187,16 +192,25 @@ class DataBase:
                 # y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x
+                x_series_normalize_func_reverse, y_series_normalize_func_reverse = lambda x: x, lambda x: x
         else:
             if normalize:
                 x_series_normalize_func = predict_funcs['x_series_normalize_func']
                 y_series_normalize_func = predict_funcs['y_series_normalize_func']
+                x_series_normalize_func_reverse = predict_funcs['x_series_normalize_func_reverse']
+                y_series_normalize_func_reverse = predict_funcs['y_series_normalize_func_reverse']
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x
+                x_series_normalize_func_reverse, y_series_normalize_func_reverse = lambda x: x, lambda x: x
 
         x_new = x_series_normalize_func(x_series_drop_na)
         y_new = y_series_normalize_func(y_series_drop_na)
-        predict_funcs = {'x_series_normalize_func': x_series_normalize_func, 'y_series_normalize_func': y_series_normalize_func}
+        predict_funcs = {
+            'x_series_normalize_func': x_series_normalize_func,
+            'y_series_normalize_func': y_series_normalize_func,
+            'x_series_normalize_func_reverse': x_series_normalize_func_reverse,
+            'y_series_normalize_func_reverse': y_series_normalize_func_reverse
+        }
         return x_new, y_new, predict_funcs
 
     def _get_series_to_reg(self):

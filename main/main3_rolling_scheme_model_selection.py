@@ -160,7 +160,7 @@ def model_selection_result_unstack(model_selection_result):
                 rsquared_oos.append(rsquared_)
                 mse.append(mse_)
                 msr.append(msr_)
-    df_to_ret = pd.DataFrame([time_period, model_length, var_names, rsquared_oos], index=col_names).T
+    df_to_ret = pd.DataFrame([time_period, model_length, var_names, rsquared_oos, mse, msr], index=col_names).T
     return df_to_ret
 
 

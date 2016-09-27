@@ -153,26 +153,20 @@ class Paras:
             'time_scale_x': '1min',
             'time_scale_y': '1min',
             'x_vars': [
-                'bsize1', 'asize1',
                 'bsize2', 'asize2',
-                'bsize3', 'asize3',
-                'bsize1_change', 'asize1_change',
-                'sellvolume', 'buyvolume',
-                'mid_px_ret', 'mid_px_ret_dummy',
+                'buyvolume',
                 'volume_index_sh50',
-                'volatility_index300_60s',
-                'ret_index_index_future_300',
-                'buy_vol_10min_intraday_pattern_20_days',
                 ],
             # 'y_vars': ['sellvolume'],
             'y_vars': ['buyvolume'],
             'spread_threshold': (0 * self.min_tick, 100 * self.min_tick),
             'lag_terms': [  # (var_name, [lags])
-                ('asize1_change', [1, 2, 3, 4, 5]),
-                ('bsize1_change', [1, 2, 3, 4, 5]),
-                ('buyvolume', [1, 2, 3]),
-                ('sellvolume', [1, 2, 3]),
-            ]
+                ('buyvolume', [2]),
+            ],
+            'high_order2_term_x': [
+                'buyvolume'
+            ],
+
         }
         return d
 

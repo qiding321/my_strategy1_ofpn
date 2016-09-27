@@ -5,8 +5,6 @@ Created on 2016/9/16 15:24
 @author: qiding
 """
 
-import os
-
 import data.data
 import data.reg_data
 import log.log
@@ -30,7 +28,7 @@ testing_demean_period = '12M'
 normalize = True
 # normalize = False
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_selected_vars'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()
@@ -38,14 +36,13 @@ output_path = my_path.path.market_making_result_root + time_now_str + descriptio
 
 
 def main():
-
     # ==========================date=============================
     rolling_date_begin = '20130801'
     # training_date_begin = '20150101'
     rolling_date_end = '20160831'
 
     # ==========================paras============================
-    my_para = paras.paras.Paras().paras1  # todo
+    my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras1_high_order  # todo
     # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
@@ -87,23 +84,23 @@ def main():
         predict_result = reg_data_testing.predict(add_const=add_const)
         # print(predict_result)
 
-        name = in_sample_period + '_' + out_of_sample_period
+        time_period_name = in_sample_period + '_' + out_of_sample_period
         err_testing = reg_data_testing.get_err(add_const=add_const)
-        reg_data_testing.report_err(output_path, err_testing, name=name)
+        reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
+        reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs)
 
 
 if __name__ == '__main__':
-    import cProfile
+    # import cProfile
+    #
+    # cprofile_path = output_path + 'cProfile'
+    # if not os.path.exists(output_path):
+    #     os.makedirs(output_path)
+    # cProfile.run('main()', cprofile_path)
+    #
+    # import pstats
+    #
+    # p = pstats.Stats(cprofile_path)
+    # p.sort_stats('cumulative').print_stats()
 
-    cprofile_path = output_path + 'cProfile'
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-    cProfile.run('main()', cprofile_path)
-
-    import pstats
-
-    p = pstats.Stats(cprofile_path)
-    p.sort_stats('cumulative').print_stats()
-
-
-    # main()
+    main()

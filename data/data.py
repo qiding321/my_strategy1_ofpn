@@ -59,7 +59,7 @@ class DataBase:
             # ) if x_names is None else x_names
             # self.y_names = y_names
 
-    def generate_reg_data(self, normalize_funcs=None, normalize=True):
+    def generate_reg_data(self, normalize_funcs=None, normalize=True, divided_std=False):
 
         time_scale_x = self.para_dict['time_scale_x']
         time_scale_y = self.para_dict['time_scale_y']
@@ -73,7 +73,8 @@ class DataBase:
 
         # lag and normalize
         if normalize_funcs is None:
-            x_series_new, y_series_new, normalize_funcs = self._get_useful_lag_series(x_series, y_series, time_scale_x, time_scale_y, time_scale_now, normalize=normalize)
+            x_series_new, y_series_new, normalize_funcs = self._get_useful_lag_series(x_series, y_series, time_scale_x, time_scale_y, time_scale_now, normalize=normalize,
+                                                                                      divided_std=divided_std)
             x_series_rename = x_series_new.rename(columns=dict([(name, name+'_x') for name in x_series_new]))
             y_series_rename = y_series_new.rename(columns=dict([(name, name+'_y') for name in y_series_new]))
 
@@ -118,7 +119,8 @@ class DataBase:
 
         return data_df
 
-    def _get_useful_lag_series(self, x_vars, y_vars, time_scale_x, time_scale_y, time_scale_now, type_='training', predict_funcs=None, normalize=True):  # todo  check
+    def _get_useful_lag_series(self, x_vars, y_vars, time_scale_x, time_scale_y, time_scale_now, type_='training', predict_funcs=None, normalize=True,
+                               divided_std=False):  # todo  check
         assert type_ in ['training', 'predict']
 
         window_x = util.util.get_windows(time_scale_long=time_scale_x, time_scale_short=time_scale_now)
@@ -175,23 +177,37 @@ class DataBase:
         if type_ == 'training':
             if normalize:
                 # normalize modified: divided by std or not
-                x_series_normalize_func = lambda x_: pd.DataFrame(
-                    [(x_[col] - x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
-                ).T
-                y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                if divided_std:
+                    x_series_normalize_func = lambda x_: pd.DataFrame(
+                        [(x_[col] - x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                    ).T
+                    y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
-                x_series_normalize_func_reverse = lambda x_: pd.DataFrame(
-                    [(x_[col] + x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
-                ).T
+                    x_series_normalize_func_reverse = lambda x_: pd.DataFrame(
+                        [(x_[col] + x_series_drop_na[col].mean()) if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
+                    ).T
 
-                assert len(y_series_drop_na.columns) == 1
-                y_series_normalize_func_reverse = lambda y_: pd.DataFrame([(y_[col] + y_series_drop_na.iloc[:, 0].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                    assert len(y_series_drop_na.columns) == 1
+                    y_series_normalize_func_reverse = lambda y_: pd.DataFrame(
+                        [(y_[col] + y_series_drop_na.iloc[:, 0].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
-                # divide version
-                # x_series_normalize_func = lambda x_: pd.DataFrame(
-                #     [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if x_series_drop_na[col].std() != 0]
-                # ).T
-                # y_series_normalize_func = lambda y_: pd.DataFrame([(y_[col] - y_series_drop_na[col].mean())/y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                else:
+                    # divide version
+                    x_series_normalize_func = lambda x_: pd.DataFrame(
+                        [(x_[col] - x_series_drop_na[col].mean()) / x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if
+                         x_series_drop_na[col].std() != 0]
+                    ).T
+                    y_series_normalize_func = lambda y_: pd.DataFrame(
+                        [(y_[col] - y_series_drop_na[col].mean()) / y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                    x_series_normalize_func_reverse = lambda x_: pd.DataFrame(
+                        [(x_[col] + x_series_drop_na[col].mean()) * x_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else x_[col] for col in list(set(x_.columns)) if
+                         x_series_drop_na[col].std() != 0]
+                    ).T
+
+                    assert len(y_series_drop_na.columns) == 1
+                    y_series_normalize_func_reverse = lambda y_: pd.DataFrame(
+                        [(y_[col] + y_series_drop_na.iloc[:, 0].mean()) * y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x
                 x_series_normalize_func_reverse, y_series_normalize_func_reverse = lambda x: x, lambda x: x

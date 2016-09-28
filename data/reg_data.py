@@ -41,7 +41,7 @@ class RegDataTraining:
             self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras)
             return self.paras.rsquared
         elif method == util.const.FITTING_METHOD.DECTREE:
-            self.model = DecisionTreeRegressor(max_depth=10)
+            self.model = DecisionTreeRegressor(max_depth=5)
             self.model.fit(self.x_vars, self.y_vars)
             y_predict_insample = self.model.predict(self.x_vars)
             self.y_predict_insample = y_predict_insample

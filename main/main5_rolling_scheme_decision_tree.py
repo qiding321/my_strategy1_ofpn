@@ -27,8 +27,11 @@ testing_period = '1M'
 testing_demean_period = '12M'
 normalize = True
 # normalize = False
+divided_std = True
+
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_all_vars_1min'.format(training_period, testing_period, testing_demean_period)
+# description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_all_vars_divstd_1min'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_selected_vars_divstd_1min_depth5'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()
@@ -43,8 +46,8 @@ def main():
 
     # ==========================paras============================
     # my_para = paras.paras.Paras().paras_after_selection  # todo
-    my_para = paras.paras.Paras().paras1_high_order  # todo
-    # my_para = paras.paras.Paras().paras_after_selection  # todo
+    # my_para = paras.paras.Paras().paras1_high_order  # todo
+    my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
 
@@ -77,7 +80,7 @@ def main():
         assert isinstance(data_training, data.data.TrainingData) and isinstance(data_predicting, data.data.TestingData)
         reg_data_training, normalize_funcs_useless = data_training.generate_reg_data(normalize=normalize)
         reg_data_demean_useless, normalize_funcs = data_demean.generate_reg_data(normalize=normalize)
-        reg_data_testing, normalize_funcs = data_predicting.generate_reg_data(normalize_funcs=normalize_funcs, normalize=normalize)
+        reg_data_testing, normalize_funcs = data_predicting.generate_reg_data(normalize_funcs=normalize_funcs, normalize=normalize, divided_std=divided_std)
 
         assert isinstance(reg_data_training, data.reg_data.RegDataTraining)
         assert isinstance(reg_data_testing, data.reg_data.RegDataTest)

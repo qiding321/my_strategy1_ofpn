@@ -53,7 +53,7 @@ class Paras:
             'time_freq': '15s',
             # 'time_scale_x': '15s',
             # 'time_scale_y': '15s',
-            'time_scale_x': '15min',
+            'time_scale_x': '1min',
             'time_scale_y': '1min',
             'x_vars': [
                 'bsize1', 'asize1',
@@ -150,8 +150,8 @@ class Paras:
         d = {
             'method': 'test',
             'time_freq': '15s',
-            'time_scale_x': '10min',
-            'time_scale_y': '10min',
+            'time_scale_x': '1min',
+            'time_scale_y': '1min',
             'x_vars': [
                 'asize2',
                 'buyvolume',

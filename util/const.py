@@ -32,5 +32,8 @@ class fitting_method:
     def DECTREE(self):
         return 'DecisionTreeRegression'
 
+    @property
+    def ADABOOST(self):
+        return 'DecisionTreeAdaboost'
 
 FITTING_METHOD = fitting_method()

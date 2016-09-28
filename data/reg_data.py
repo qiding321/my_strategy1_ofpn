@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.tree import DecisionTreeRegressor
 
 import log.log
@@ -30,7 +31,7 @@ class RegDataTraining:
         self.model = None
         self.y_predict_insample = None
 
-    def fit(self, add_const=True, method=util.const.FITTING_METHOD.OLS):
+    def fit(self, add_const=True, method=util.const.FITTING_METHOD.OLS, decision_tree_depth=None):
         if method == util.const.FITTING_METHOD.OLS:
             if add_const:
                 x_new = sm.add_constant(self.x_vars)
@@ -41,7 +42,13 @@ class RegDataTraining:
             self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras)
             return self.paras.rsquared
         elif method == util.const.FITTING_METHOD.DECTREE:
-            self.model = DecisionTreeRegressor(max_depth=5)
+            self.model = DecisionTreeRegressor(max_depth=decision_tree_depth)
+            self.model.fit(self.x_vars, self.y_vars)
+            y_predict_insample = self.model.predict(self.x_vars)
+            self.y_predict_insample = y_predict_insample
+        elif method == util.const.FITTING_METHOD.ADABOOST:
+            rng = np.random.RandomState(1)
+            self.model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=decision_tree_depth), n_estimators=300, random_state=rng)
             self.model.fit(self.x_vars, self.y_vars)
             y_predict_insample = self.model.predict(self.x_vars)
             self.y_predict_insample = y_predict_insample

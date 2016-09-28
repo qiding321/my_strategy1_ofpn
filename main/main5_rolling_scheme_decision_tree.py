@@ -29,9 +29,20 @@ normalize = True
 # normalize = False
 divided_std = True
 
+method = util.const.FITTING_METHOD.ADABOOST
+# method = util.const.FITTING_METHOD.OLS
+# method = util.const.FITTING_METHOD.DECTREE
+
+para_type = 'selected_vars'
+# para_type = 'all_vars'
+
+decision_tree_depth = 10
+
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-# description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_all_vars_divstd_1min'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_selected_vars_divstd_1min_depth5'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_{}_{}_predict_{}_normalized_by_{}_all_vars_{}_1min_depth{}'.format(method, training_period, testing_period, testing_demean_period,
+                                                                                          'divstd' if divided_std else 'notdivstd', decision_tree_depth)
+# description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_selected_vars_divstd_1min_depth5'.format(training_period, testing_period, testing_demean_period)
+
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()
@@ -47,8 +58,17 @@ def main():
     # ==========================paras============================
     # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras1_high_order  # todo
-    my_para = paras.paras.Paras().paras_after_selection  # todo
+    # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
+
+    if para_type == 'selected_vars':
+        my_para = paras.paras.Paras().paras_after_selection
+    elif para_type == 'all_vars':
+        my_para = paras.paras.Paras().paras1_high_order
+    else:
+        print('unknow para type')
+        raise ValueError
+
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
 
     # =========================log================================
@@ -86,9 +106,9 @@ def main():
         assert isinstance(reg_data_testing, data.reg_data.RegDataTest)
 
         # ===========================reg and predict=====================
-        reg_result = reg_data_training.fit(add_const=add_const, method=util.const.FITTING_METHOD.DECTREE)
-        reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras, method=util.const.FITTING_METHOD.DECTREE)
-        predict_result = reg_data_testing.predict(add_const=add_const, method=util.const.FITTING_METHOD.DECTREE)
+        reg_result = reg_data_training.fit(add_const=add_const, method=method, decision_tree_depth=decision_tree_depth)
+        reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras, method=method)
+        predict_result = reg_data_testing.predict(add_const=add_const, method=method)
 
         r_sq_in_sample = util.util.cal_r_squared(y_raw=reg_data_training.y_vars.values.T[0], y_predict=reg_data_training.y_predict_insample, y_training=reg_data_training.y_vars.values.T[0])
         r_sq_out_of_sample = util.util.cal_r_squared(y_raw=reg_data_testing.y_vars.values.T[0], y_predict=reg_data_testing.predict_y.T, y_training=reg_data_training.y_vars.values.T[0])

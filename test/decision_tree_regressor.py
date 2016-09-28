@@ -7,6 +7,7 @@ Created on 2016/9/28 10:19
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.tree import DecisionTreeRegressor
 
 
@@ -49,7 +50,10 @@ def main():
     testing_y, testing_x = generate_sample(func=func, length=testing_length)
 
     # training and fitting
-    training_model = DecisionTreeRegressor(max_depth=10)
+    rng = np.random.RandomState(1)
+    max_depth = 10
+    # training_model = DecisionTreeRegressor(max_depth=max_depth)
+    training_model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=max_depth), n_estimators=300, random_state=rng)
     training_model.fit(training_x, training_y)
     y_predict = training_model.predict(training_x)
     y_predict_oos = training_model.predict(testing_x)

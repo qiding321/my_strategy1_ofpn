@@ -28,7 +28,7 @@ testing_demean_period = '12M'
 normalize = True
 # normalize = False
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_selected_vars_1min'.format(training_period, testing_period, testing_demean_period)
+description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_all_vars_1min'.format(training_period, testing_period, testing_demean_period)
 
 # ==========================output path======================
 time_now_str = util.util.get_timenow_str()
@@ -42,8 +42,8 @@ def main():
     rolling_date_end = '20160831'
 
     # ==========================paras============================
-    my_para = paras.paras.Paras().paras_after_selection  # todo
-    # my_para = paras.paras.Paras().paras1_high_order  # todo
+    # my_para = paras.paras.Paras().paras_after_selection  # todo
+    my_para = paras.paras.Paras().paras1_high_order  # todo
     # my_para = paras.paras.Paras().paras_after_selection  # todo
     # my_para = paras.paras.Paras().paras_neat_buy
     add_const = True if 'add_const' not in my_para.keys() else my_para['add_const']
@@ -85,11 +85,10 @@ def main():
         # ===========================reg and predict=====================
         reg_result = reg_data_training.fit(add_const=add_const, method=util.const.FITTING_METHOD.DECTREE)
         reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras, method=util.const.FITTING_METHOD.DECTREE)
-        predict_result = reg_data_testing.predict(add_const=add_const)
+        predict_result = reg_data_testing.predict(add_const=add_const, method=util.const.FITTING_METHOD.DECTREE)
 
-        time_period_name = in_sample_period + '_' + out_of_sample_period
-        r_sq_in_sample = util.util.cal_r_squared(y_raw=reg_data_training, y_predict=predict_result, y_training=reg_data_training.y_vars)
-        r_sq_out_of_sample = util.util.cal_r_squared(y_raw=reg_data_testing.y_vars, y_predict=predict_result, y_training=reg_data_training.y_vars)
+        r_sq_in_sample = util.util.cal_r_squared(y_raw=reg_data_training.y_vars.values.T[0], y_predict=reg_data_training.y_predict_insample, y_training=reg_data_training.y_vars.values.T[0])
+        r_sq_out_of_sample = util.util.cal_r_squared(y_raw=reg_data_testing.y_vars.values.T[0], y_predict=reg_data_testing.predict_y.T, y_training=reg_data_training.y_vars.values.T[0])
         with open(output_file, 'a') as f_out:
             to_record = '{time_period_in_sample},{time_period_out_of_sample},{rsquared_in_sample},{rsquared_out_of_sample}\n'.format(
                 time_period_in_sample=in_sample_period, time_period_out_of_sample=out_of_sample_period, rsquared_in_sample=r_sq_in_sample, rsquared_out_of_sample=r_sq_out_of_sample

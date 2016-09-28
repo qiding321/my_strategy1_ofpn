@@ -14,14 +14,6 @@ import util.const
 import util.util
 
 # ==========================description=======================
-# description = 'rolling_new_one_year_not_normalized_neat_buy'  # todo
-# description = 'rolling_one_year_normalized_neat_buy'  # todo
-# description = 'rolling_new_one_year_not_normalized_buy'  # todo
-# description = 'rolling_one_year_normalized_buy_68vars_add_const'  # todo
-# description = 'rolling_one_year_normalized_buy_68vars_not_add_const'  # todo
-# description = 'rolling_one_year_normalized_buy_selected_vars'  # todo
-# description = 'test'  # todo
-
 training_period = '12M'
 testing_period = '1M'
 testing_demean_period = '12M'
@@ -36,7 +28,8 @@ method = util.const.FITTING_METHOD.ADABOOST
 para_type = 'selected_vars'
 # para_type = 'all_vars'
 
-decision_tree_depth = 10
+decision_tree_depth = 5
+# decision_tree_depth = 10
 
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
 description = 'rolling_{}_{}_predict_{}_normalized_by_{}_all_vars_{}_1min_depth{}'.format(method, training_period, testing_period, testing_demean_period,

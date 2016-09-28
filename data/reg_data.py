@@ -103,7 +103,7 @@ class RegDataTest:
             # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
             rsquared_out_of_sample = 1 - (ssr * ssr).sum() / (sse * sse).sum()
             return rsquared_out_of_sample
-        elif method == util.const.FITTING_METHOD.DECTREE:
+        elif method == util.const.FITTING_METHOD.DECTREE or method == util.const.FITTING_METHOD.ADABOOST:
             if self.predict_y is None:
                 data_predict = self.model.predict(self.x_vars)
                 self.predict_y = data_predict
@@ -111,6 +111,7 @@ class RegDataTest:
                 data_predict = self.predict_y
         else:
             my_log.error('method not found: {}'.format(method))
+            raise ValueError
 
     def get_err(self, add_const=True):
 

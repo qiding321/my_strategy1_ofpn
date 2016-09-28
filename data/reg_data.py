@@ -11,8 +11,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from sklearn.tree import DecisionTreeRegressor
 
+import log.log
+import util.const
 import util.util
+
+my_log = log.log.log_order_flow_predict
 
 
 class RegDataTraining:
@@ -23,14 +28,26 @@ class RegDataTraining:
         self.x_var_names = x_vars.columns
         self.paras = None
         self.model = None
+        self.y_predict_insample = None
 
-    def fit(self, add_const=True):
-        if add_const:
-            self.model = sm.OLS(self.y_vars, sm.add_constant(self.x_vars), hasconst=True)
+    def fit(self, add_const=True, method=util.const.FITTING_METHOD.OLS):
+        if method == util.const.FITTING_METHOD.OLS:
+            if add_const:
+                x_new = sm.add_constant(self.x_vars)
+            else:
+                x_new = self.x_vars
+            self.model = sm.OLS(self.y_vars, x_new, hasconst=add_const)
+            self.paras = self.model.fit()
+            self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras)
+            return self.paras.rsquared
+        elif method == util.const.FITTING_METHOD.DECTREE:
+            self.model = DecisionTreeRegressor(max_depth=10)
+            self.model.fit(self.x_vars, self.y_vars)
+            y_predict_insample = self.model.predict(self.x_vars)
+            self.y_predict_insample = y_predict_insample
         else:
-            self.model = sm.OLS(self.y_vars, self.x_vars, hasconst=False)
-        self.paras = self.model.fit()
-        return self.paras.rsquared
+            my_log.error('reg_method not found: {}'.format(method))
+            raise ValueError
 
     def vars_iteration_model_selection(self, vars_left):
         for drop_var in vars_left:
@@ -60,24 +77,33 @@ class RegDataTest:
         self.predict_y = None
         self.err_dict = None
 
-    def add_model(self, model, paras):
+    def add_model(self, model=None, paras=None, method=util.const.FITTING_METHOD.OLS):
         self.model = model
         self.paras = paras
 
-    def predict(self, add_const=True):  # todo
-        if self.predict_y is None:
-            if add_const:
-                data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+    def predict(self, add_const=True, method=util.const.FITTING_METHOD.OLS):  # todo
+        if method == util.const.FITTING_METHOD.OLS:
+            if self.predict_y is None:
+                if add_const:
+                    data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+                else:
+                    data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+                self.predict_y = data_predict
             else:
-                data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
-            self.predict_y = data_predict
+                data_predict = self.predict_y
+            ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
+            sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
+            # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
+            rsquared_out_of_sample = 1 - (ssr * ssr).sum() / (sse * sse).sum()
+            return rsquared_out_of_sample
+        elif method == util.const.FITTING_METHOD.DECTREE:
+            if self.predict_y is None:
+                data_predict = self.model.predict(self.x_vars)
+                self.predict_y = data_predict
+            else:
+                data_predict = self.predict_y
         else:
-            data_predict = self.predict_y
-        ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
-        sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
-        # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
-        rsquared_out_of_sample = 1 - (ssr * ssr).sum()/(sse * sse).sum()
-        return rsquared_out_of_sample
+            my_log.error('method not found: {}'.format(method))
 
     def get_err(self, add_const=True):
 

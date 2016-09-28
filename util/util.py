@@ -135,3 +135,12 @@ def get_offset(time_period):
         raise ValueError
 
     return offset
+
+
+def cal_r_squared(y_raw, y_predict, y_training):
+    e = y_raw - y_training.mean()
+    mse = (e * e).mean()
+    r = y_raw - y_predict
+    msr = (r * r).mean()
+    r_sq = 1 - msr / mse
+    return r_sq

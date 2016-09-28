@@ -21,3 +21,16 @@ MIN_TICK_SIZE = 100
 
 # TIME_SCALE_LIST = ['1min', '5min', '10min', '15min']
 TIME_SCALE_LIST = ['15s', '1min', '5min', '10min', '15min']
+
+
+class fitting_method:
+    @property
+    def OLS(self):
+        return 'OLS'
+
+    @property
+    def DECTREE(self):
+        return 'DecisionTreeRegression'
+
+
+FITTING_METHOD = fitting_method()

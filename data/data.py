@@ -21,7 +21,7 @@ my_log = log.log.log_order_flow_predict
 
 
 class DataBase:
-    def __init__(self, date_begin='', date_end='', para_dict=None, have_data_df=False, data_df=None, x_names=None, y_names=None):
+    def __init__(self, date_begin='', date_end='', para_dict=None, have_data_df=False, data_df=None):
         assert isinstance(date_begin, str) and isinstance(date_end, str)
         assert isinstance(para_dict, dict)
         self.source_data_path = my_path.path.data_source_path
@@ -37,29 +37,15 @@ class DataBase:
                     self.data_df[var_moving_average] = self._get_one_col(var_moving_average)
             else:
                 self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
-                # if 'buy_vol_10min_intraday_pattern_20_days' in self.para_dict['x_vars'] or 'sell_vol_10min_intraday_pattern_20_days' in self.para_dict['x_vars']:
-            #     self.data_df = self._get_data_add_20_day_before(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
-            #
-            #     # pre-treat intraday_pattern
-                #     for col in ['buy_vol_10min_intraday_pattern_20_days', 'sell_vol_10min_intraday_pattern_20_days']:
-            #         if col in self.para_dict['x_vars']:
-            #             self.data_df[col] = self._get_one_col(col)
-            # else:
-            #     self.data_df = self._get_data(data_path=self.source_data_path, date_begin=date_begin, date_end=date_end)
         else:
             data_df = data_df.sort_index()
             self.date_begin = data_df.index[0]
             self.date_end = data_df.index[-1]
             self.data_df = data_df
-            # self.x_names = x_names
-            # self.x_names = (
-            #     self.para_dict['x_vars'] +
-            #     (self.para_dict['x_vars_moving_average'] if 'x_vars_moving_average' in self.para_dict.keys() else []) +
-            #     (util.util.high_order_name_change(self.para_dict['high_order2_term_x']) if 'high_order2_term_x' in self.para_dict.keys() else [])
-            # ) if x_names is None else x_names
-            # self.y_names = y_names
 
-    def generate_reg_data(self, normalize_funcs=None, normalize=True, divided_std=False):
+    def generate_reg_data(self, normalize_funcs=None):
+        normalize = self.para_dict['normalize']
+        divided_std = self.para_dict['divided_std']
 
         time_scale_x = self.para_dict['time_scale_x']
         time_scale_y = self.para_dict['time_scale_y']
@@ -78,14 +64,14 @@ class DataBase:
             x_series_rename = x_series_new.rename(columns=dict([(name, name+'_x') for name in x_series_new]))
             y_series_rename = y_series_new.rename(columns=dict([(name, name+'_y') for name in y_series_new]))
 
-            reg_data = data.reg_data.RegDataTraining(x_vars=x_series_rename, y_vars=y_series_rename)
+            reg_data = data.reg_data.RegDataTraining(x_vars=x_series_rename, y_vars=y_series_rename, paras_model=self.para_dict)
 
         else:
-            x_series_new, y_series_new, normalize_funcs = self._get_useful_lag_series(x_series, y_series, time_scale_x, time_scale_y, time_scale_now, type_='predict', predict_funcs=normalize_funcs, normalize=normalize)
+            x_series_new, y_series_new, normalize_funcs = self._get_useful_lag_series(x_series, y_series, time_scale_x, time_scale_y, time_scale_now, type_='predict', predict_funcs=normalize_funcs)
             x_series_rename = x_series_new.rename(columns=dict([(name, name+'_x') for name in x_series_new]))
             y_series_rename = y_series_new.rename(columns=dict([(name, name+'_y') for name in y_series_new]))
 
-            reg_data = data.reg_data.RegDataTest(x_vars=x_series_rename, y_vars=y_series_rename)
+            reg_data = data.reg_data.RegDataTest(x_vars=x_series_rename, y_vars=y_series_rename, paras_model=self.para_dict)
 
         return reg_data, normalize_funcs
 
@@ -206,7 +192,7 @@ class DataBase:
 
                     assert len(y_series_drop_na.columns) == 1
                     y_series_normalize_func_reverse = lambda y_: pd.DataFrame(
-                        [(y_[col] + y_series_drop_na.iloc[:, 0].mean()) * y_series_drop_na[col].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                        [(y_[col] + y_series_drop_na.iloc[:, 0].mean()) * y_series_drop_na.iloc[:, 0].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x
@@ -235,9 +221,11 @@ class DataBase:
 
         time_freq = self.para_dict['time_freq']
 
+        # ================================== y vars ==================================
         y_vars_name = self.para_dict['y_vars']
-        y_vars = self._get_vars(y_vars_name, time_freq)
+        y_vars_raw = self._get_vars(y_vars_name, time_freq)
 
+        # ================================== x vars ==================================
         x_vars_name_raw = self.para_dict['x_vars']
 
         if 'x_vars_moving_average' in self.para_dict.keys():
@@ -251,17 +239,36 @@ class DataBase:
         else:
             x_vars_name = x_vars_name_raw1
 
-        x_vars = self._get_vars(x_vars_name, time_freq)
+        x_vars_raw = self._get_vars(x_vars_name, time_freq)
 
+        # ================================== trancate ==================================
+        x_vars_not_trancated_nona, y_vars_not_trancated_nona = self._dropna(x_vars_raw, y_vars_raw, to_log=True)
+        trancate_para = self.para_dict['trancate_para']
+        if trancate_para.trancate:
+            x_vars, x_trancated_dummy = self._trancate(x_vars_not_trancated_nona)
+            y_vars, y_trancated_dummy = self._trancate(y_vars_not_trancated_nona)
+        else:
+            x_vars, y_vars = x_vars_raw, y_vars_raw
+
+        # ================================= drop na ===================================
+        x_vars_dropna, y_vars_dropna = self._dropna(x_vars, y_vars, to_log=True)
+        return y_vars_dropna, x_vars_dropna
+
+    @classmethod
+    def _dropna(cls, x_vars, y_vars, to_log=True):
         data_merged = pd.DataFrame(pd.concat([x_vars, y_vars], keys=['x', 'y'], axis=1))
         data_merged_drop_na = data_merged.dropna()
         x_vars_dropna = data_merged_drop_na['x']
         y_vars_dropna = data_merged_drop_na['y']
 
-        my_log.info('data_length_raw: {}\ndata_length_na: {}\ndata_length_dropna: {}'
-                    .format(len(data_merged), len(data_merged) - len(data_merged_drop_na), len(data_merged_drop_na)))
+        if to_log:
+            log_func = my_log.info
+        else:
+            log_func = my_log.debug
+        log_func('data_length_raw: {}\ndata_length_na: {}\ndata_length_dropna: {}'
+                 .format(len(data_merged), len(data_merged) - len(data_merged_drop_na), len(data_merged_drop_na)))
 
-        return y_vars_dropna, x_vars_dropna
+        return x_vars_dropna, y_vars_dropna
 
     def _get_vars(self, vars_name, time_freq):
         assert isinstance(vars_name, list)
@@ -416,6 +423,49 @@ class DataBase:
             raise TypeError
         return data_new
 
+    def _trancate(self, vars):
+        trancate_para = self.para_dict['trancate_para']
+        vars_to_trancate = [var_ for var_ in trancate_para.trancate_vars if var_ in vars.columns]
+        method_ = trancate_para.trancate_method
+        trancate_window = trancate_para.trancate_window
+        trancate_std = trancate_para.trancate_std
+        trancated_dummy_list = []
+        if method_ == 'mean_std':
+            for var_ in vars_to_trancate:
+                my_log.info('trancate begin: ' + var_)
+                vars[var_], trancated_dummy_ = self._trancate_mean_std(var_col=vars[var_], window=trancate_window, trancate_std=trancate_std)
+                trancated_dummy_list.append(trancated_dummy_)
+                my_log.info('trancate end: {}, trancated num: {}'.format(var_, len(trancated_dummy_[trancated_dummy_ != 0])))
+        else:
+            my_log.error('wrong trancate method: {}'.format(method_))
+            raise ValueError
+        trancated_dummy_df = pd.concat(trancated_dummy_list, axis=1, keys=vars_to_trancate)
+        return vars, trancated_dummy_df
+
+    @classmethod
+    def _trancate_mean_std(cls, var_col, window, trancate_std):
+        n_ = len(var_col)
+        var_col_new = pd.Series([np.nan] * n_, index=var_col.index)
+        var_col_dummy = pd.Series([np.nan] * n_, index=var_col.index)
+        var_col_new.iloc[0:window] = var_col.iloc[0:window]
+        for i in range(window, n_):
+            var_tmp = var_col_new[i - window:i]
+            mean_tmp = var_tmp.mean()
+            std_tmp = var_tmp.std()
+            point_raw = var_col.iloc[i]
+            if point_raw >= mean_tmp + trancate_std * std_tmp:
+                point_new = mean_tmp + trancate_std * std_tmp
+                dummy = 1
+            elif point_raw <= mean_tmp - trancate_std * std_tmp:
+                point_new = mean_tmp - trancate_std * std_tmp
+                dummy = -1
+            else:
+                point_new = point_raw
+                dummy = 0
+            var_col_new.iloc[i] = point_new
+            var_col_dummy.iloc[i] = dummy
+        return var_col_new, var_col_dummy
+
 
 class TrainingData(DataBase):
     pass
@@ -436,35 +486,11 @@ class DataRolling(DataBase):
 
         offset_training = util.util.get_offset(self.training_period)
         offset_predict = util.util.get_offset(self.testing_period)
-        # if self.training_period == '12M' and self.testing_period == '1M':
-        #     offset_training = pd.tseries.offsets.MonthEnd(12)  # todo
-        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
-        # elif self.training_period == '18M' and self.testing_period == '1M':
-        #     offset_training = pd.tseries.offsets.MonthEnd(18)
-        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
-        # elif self.training_period == '6M' and self.testing_period == '1M':
-        #     offset_training = pd.tseries.offsets.MonthEnd(6)
-        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
-        # elif self.training_period == '1M' and self.testing_period == '1M':
-        #     offset_training = pd.tseries.offsets.MonthEnd(1)
-        #     offset_predict = pd.tseries.offsets.MonthEnd(1)
-        # else:
-        #     my_log.error('training_period: ' + self.training_period)
-        #     my_log.error('testing_period: ' + self.testing_period)
-        #     raise AssertionError
 
         if self.test_demean_period is None:
             offset_test_demean = offset_training
         else:
             offset_test_demean = util.util.get_offset(self.test_demean_period)
-            # if self.test_demean_period == '12M':
-            #     offset_test_demean = pd.tseries.offsets.MonthEnd(12)
-            # elif self.test_demean_period == '1M':
-            #     offset_test_demean = pd.tseries.offsets.MonthEnd(1)
-            # elif self.test_demean_period == '6M':
-            #     offset_test_demean = pd.tseries.offsets.MonthEnd(6)
-            # else:
-            #     raise ValueError
 
         offset_one_day = pd.tseries.offsets.Day(1)
         keys = ['data_training', 'data_predicting', 'data_out_of_sample_demean', 'in_sample_period', 'out_of_sample_period', 'demean_period']

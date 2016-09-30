@@ -68,7 +68,7 @@ def main():
     r_sq = cal_rsquared(y, y_predict)
     print(r_sq)
 
-    lag = 10
+    lag = 5
     x_5 = get_sum(x, lag)
     y_5 = get_sum(y, lag)
     y_predict_5 = reg(x_5, y_5)

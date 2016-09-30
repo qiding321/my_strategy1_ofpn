@@ -22,31 +22,37 @@ my_log = log.log.log_order_flow_predict
 
 
 class RegDataTraining:
-    def __init__(self, x_vars, y_vars):
+    def __init__(self, x_vars, y_vars, paras_model):
         self.x_vars = x_vars
         self.y_vars = y_vars
         self.num_of_x_vars = len(x_vars.columns)
         self.x_var_names = x_vars.columns
-        self.paras = None
+        self.paras_reg = None
+        self.paras_model = paras_model
         self.model = None
         self.y_predict_insample = None
 
-    def fit(self, add_const=True, method=util.const.FITTING_METHOD.OLS, decision_tree_depth=None):
+    def fit(self):
+        add_const = self.paras_model['add_const']
+        method = self.paras_model['method']
+
         if method == util.const.FITTING_METHOD.OLS:
             if add_const:
                 x_new = sm.add_constant(self.x_vars)
             else:
                 x_new = self.x_vars
             self.model = sm.OLS(self.y_vars, x_new, hasconst=add_const)
-            self.paras = self.model.fit()
-            self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras)
-            return self.paras.rsquared
+            self.paras_reg = self.model.fit()
+            self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras_reg.params)
+            return self.paras_reg.rsquared
         elif method == util.const.FITTING_METHOD.DECTREE:
+            decision_tree_depth = self.paras_model['decision_tree'].decision_tree_depth
             self.model = DecisionTreeRegressor(max_depth=decision_tree_depth)
             self.model.fit(self.x_vars, self.y_vars)
             y_predict_insample = self.model.predict(self.x_vars)
             self.y_predict_insample = y_predict_insample
         elif method == util.const.FITTING_METHOD.ADABOOST:
+            decision_tree_depth = self.paras_model['decision_tree'].decision_tree_depth
             rng = np.random.RandomState(1)
             self.model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=decision_tree_depth), n_estimators=300, random_state=rng)
             self.model.fit(self.x_vars, self.y_vars)
@@ -61,40 +67,45 @@ class RegDataTraining:
             vars_new = [var_ for var_ in vars_left if var_ != drop_var]
             x_vars = self.x_vars[vars_new]
             y_vars = self.y_vars
-            reg_data_new = RegDataTraining(x_vars=x_vars, y_vars=y_vars)
+            reg_data_new = RegDataTraining(x_vars=x_vars, y_vars=y_vars, paras_model=self.paras_model)
             yield reg_data_new
 
     def result_record_str(self):
-        coef = self.paras.params
-        tvalues = self.paras.tvalues
+        coef = self.paras_reg.params
+        tvalues = self.paras_reg.tvalues
         df = pd.concat([coef, tvalues], keys=['coef', 'tvalues'], axis=1).T
         to_ret = util.util.pandas2str(df, title='training_result')
 
-        to_ret += 'rsquared,{}'.format(self.paras.rsquared)
+        to_ret += 'rsquared,{}'.format(self.paras_reg.rsquared)
 
         return to_ret
 
 
 class RegDataTest:
-    def __init__(self, x_vars, y_vars):
+    def __init__(self, x_vars, y_vars, paras_model):
         self.x_vars = x_vars
         self.y_vars = y_vars
         self.model = None
-        self.paras = None
+        self.paras_reg = None
+        self.paras_model = paras_model
         self.predict_y = None
         self.err_dict = None
 
-    def add_model(self, model=None, paras=None, method=util.const.FITTING_METHOD.OLS):
+    def add_model(self, model=None, paras=None):
         self.model = model
-        self.paras = paras
+        self.paras_reg = paras
 
-    def predict(self, add_const=True, method=util.const.FITTING_METHOD.OLS):  # todo
+    def predict(self):  # todo
+
+        add_const = self.paras_model['add_const']
+        method = self.paras_model['method']
+
         if method == util.const.FITTING_METHOD.OLS:
             if self.predict_y is None:
                 if add_const:
-                    data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+                    data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras_reg.params)
                 else:
-                    data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+                    data_predict = self.model.predict(exog=self.x_vars, params=self.paras_reg.params)
                 self.predict_y = data_predict
             else:
                 data_predict = self.predict_y
@@ -113,15 +124,17 @@ class RegDataTest:
             my_log.error('method not found: {}'.format(method))
             raise ValueError
 
-    def get_err(self, add_const=True):
+    def get_err(self):
+
+        add_const = self.paras_model['add_const']
 
         y_ = self.y_vars.values
 
         if self.predict_y is None:
             if add_const:
-                data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras.params)
+                data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras_reg.params)
             else:
-                data_predict = self.model.predict(exog=self.x_vars, params=self.paras.params)
+                data_predict = self.model.predict(exog=self.x_vars, params=self.paras_reg.params)
             self.predict_y = data_predict
         else:
             data_predict = self.predict_y
@@ -141,7 +154,7 @@ class RegDataTest:
             'sse': (sse*sse).mean(),
             'sse_by_oos_mean': (sse_by_oos_mean * sse_by_oos_mean).mean(),
             'variance_x': self.x_vars.var(),
-            'variance_x_contribution': self.x_vars.var() * (self.paras.params * self.paras.params),
+            'variance_x_contribution': self.x_vars.var() * (self.paras_reg.params * self.paras_reg.params),
             'rsquared_out_of_sample': rsquared_out_of_sample,
             'rsquared_out_of_sample_by_oos_mean': rsquared_out_of_sample_by_oos_mean,
             'var_y': var_y,
@@ -177,7 +190,7 @@ class RegDataTest:
     def generate_vars_model_selection(self, x_var_names):
         x_vars = self.x_vars[x_var_names]
         y_vars = self.y_vars
-        reg_data_new = RegDataTest(x_vars=x_vars, y_vars=y_vars)
+        reg_data_new = RegDataTest(x_vars=x_vars, y_vars=y_vars, paras_model=self.paras_model)
         return reg_data_new
 
     def report_err(self, output_path, err_dict, name):  # todo

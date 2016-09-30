@@ -83,7 +83,7 @@ def main():
         # ===========================reg and predict=====================
         reg_result = reg_data_training.fit(add_const=add_const)
         # print(reg_result)
-        reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras)
+        reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras_reg)
         predict_result = reg_data_testing.predict(add_const=add_const)
         # print(predict_result)
 

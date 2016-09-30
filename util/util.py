@@ -98,7 +98,7 @@ def pandas2str(df, title=''):
 
 
 def dict2str(d):
-    s = '\n'.join(['{}: {}'.format(k, v) for k,v in d.items()])
+    s = '\n'.join(['{}: {}'.format(k, v) for k, v in sorted(d.items())])
     return s
 
 

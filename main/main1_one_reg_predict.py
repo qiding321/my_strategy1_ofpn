@@ -5,10 +5,10 @@ Created on 2016/9/16 15:24
 @author: qiding
 """
 
-import log.log
-import paras.paras
 import data.data
 import data.reg_data
+import log.log
+import paras.paras
 import util.const
 import util.util
 
@@ -51,7 +51,7 @@ def main():
     # ===========================reg and predict=====================
     reg_result = reg_data_training.fit()
     print(reg_result)
-    reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras)
+    reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras_reg)
     predict_result = reg_data_testing.predict()
     print(predict_result)
 

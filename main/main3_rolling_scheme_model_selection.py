@@ -112,7 +112,7 @@ def main():
 
                 # regress proceed
                 reg_result = reg_data_vars_iter.fit(add_const=add_const)
-                reg_data_testing_vars_iter.add_model(reg_data_vars_iter.model, reg_data_vars_iter.paras)
+                reg_data_testing_vars_iter.add_model(reg_data_vars_iter.model, reg_data_vars_iter.paras_reg)
                 # predict_result = reg_data_testing_vars_iter.predict(add_const=add_const)
 
                 err_dict = reg_data_testing_vars_iter.get_err()

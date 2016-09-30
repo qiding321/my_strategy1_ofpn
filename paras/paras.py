@@ -90,6 +90,7 @@ class Paras:
         testing_period = '1M'
         testing_demean_period = '12M'
         reg_name = 'fixed_vars'
+        # reg_name = 'model_selection'
 
         normalize = True
         # normalize = False
@@ -172,5 +173,7 @@ class Paras:
         this_para['divided_std'] = divided_std
         this_para['trancate_para'] = trancate_para
         this_para['description'] = description
+
+        this_para['reg_name'] = reg_name
 
         return this_para

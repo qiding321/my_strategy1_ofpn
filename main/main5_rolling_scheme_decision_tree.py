@@ -32,7 +32,7 @@ decision_tree_depth = 5
 # decision_tree_depth = 10
 
 # description = 'rolling_error_decomposition_{}_predict_{}_normalized_by_{}_add_ma_add_high_order'.format(training_period, testing_period, testing_demean_period)
-description = 'rolling_{}_{}_predict_{}_normalized_by_{}_all_vars_{}_1min_depth{}'.format(method, training_period, testing_period, testing_demean_period,
+description = 'rolling_{}_{}_predict_{}_normalized_by_{}_{}_{}_1min_depth{}'.format(method, training_period, testing_period, testing_demean_period, para_type,
                                                                                           'divstd' if divided_std else 'notdivstd', decision_tree_depth)
 # description = 'rolling_decision_tree_{}_predict_{}_normalized_by_{}_selected_vars_divstd_1min_depth5'.format(training_period, testing_period, testing_demean_period)
 

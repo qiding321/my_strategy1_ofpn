@@ -247,7 +247,7 @@ class RegDataTest:
             fig = plt.figure()
             plt.plot(data_one_day['y_raw'].values, 'r-')
             plt.plot(data_one_day['y_predict'].values, 'b-')
-            fig.savefig(output_path + 'predict_volume_vs_raw_volume' + str(key) + '.png')
+            fig.savefig(output_path + 'predict_volume_vs_raw_volume' + '-'.join(key) + '.png')
             plt.close()
         error_this_month = data_merged['y_raw'] - data_merged['y_predict']
         plt.hist(error_this_month.values, 100, facecolor='b')

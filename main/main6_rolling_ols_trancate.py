@@ -81,7 +81,7 @@ def main():
                     time_period_in_sample=in_sample_period, time_period_out_of_sample=out_of_sample_period, rsquared_in_sample=r_sq_in_sample, rsquared_out_of_sample=r_sq_out_of_sample
                 )
                 f_out.write(to_record)
-            time_period_name = in_sample_period + '_' + out_of_sample_period
+            time_period_name = out_of_sample_period
             err_testing = reg_data_testing.get_err()
             reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
             reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs)

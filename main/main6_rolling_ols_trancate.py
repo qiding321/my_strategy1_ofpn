@@ -84,7 +84,7 @@ def main():
             time_period_name = out_of_sample_period
             err_testing = reg_data_testing.get_err()
             reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
-            reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs)
+            reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs, normalize_funcs_training=normalize_funcs_useless)
 
         # ===========================model selection=====================
         if my_para['reg_name'] == 'model_selection':

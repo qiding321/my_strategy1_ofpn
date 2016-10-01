@@ -223,7 +223,7 @@ class RegDataTest:
 
         data_to_rcd.sort_index(axis=1).to_csv(output_path + file_name)
 
-    def report_monthly(self, output_path, name_time_period, normalize_funcs):
+    def report_monthly(self, output_path, name_time_period, normalize_funcs, normalize_funcs_training):
         this_path = output_path + name_time_period + '\\'
         if os.path.exists(this_path):
             pass
@@ -234,7 +234,7 @@ class RegDataTest:
         self._plt_predict_volume(output_path=this_path, normalize_funcs=normalize_funcs)
 
         # daily rsquared and mse and msr
-        self._daily_rsquared_output(output_path=this_path, normalize_funcs=normalize_funcs)
+        self._daily_rsquared_output(output_path=this_path, normalize_funcs=normalize_funcs, normalize_funcs_training=normalize_funcs_training)
 
     def _plt_predict_volume(self, output_path, normalize_funcs):
         y_norm_func_rev = normalize_funcs['y_series_normalize_func_reverse']
@@ -247,7 +247,7 @@ class RegDataTest:
             fig = plt.figure()
             plt.plot(data_one_day['y_raw'].values, 'r-')
             plt.plot(data_one_day['y_predict'].values, 'b-')
-            fig.savefig(output_path + 'predict_volume_vs_raw_volume' + '-'.join(key) + '.png')
+            fig.savefig(output_path + 'predict_volume_vs_raw_volume' + '-'.join([str(k_) for k_ in key]) + '.png')
             plt.close()
         error_this_month = data_merged['y_raw'] - data_merged['y_predict']
         plt.hist(error_this_month.values, 100, facecolor='b')
@@ -261,8 +261,9 @@ class RegDataTest:
 
         err_des.to_csv(output_path + 'err_description.csv')
 
-    def _daily_rsquared_output(self, output_path, normalize_funcs, add_const=True):
+    def _daily_rsquared_output(self, output_path, normalize_funcs, normalize_funcs_training):
         y_norm_func_rev = normalize_funcs['y_series_normalize_func_reverse']
+        y_norm_func_rev_training = normalize_funcs_training['y_series_normalize_func_reverse']
         y_raw = y_norm_func_rev(self.y_vars).rename(columns={0: 'y_raw'})
         y_predict = y_norm_func_rev(pd.DataFrame([self.predict_y], columns=y_raw.index, index=['y_predict']).T)
 
@@ -270,7 +271,7 @@ class RegDataTest:
         data_merged['ymd'] = list(map(lambda x: (x.year, x.month, x.day), data_merged.index))
 
         data_merged['error'] = data_merged['y_raw'] - data_merged['y_predict']
-        data_merged['sse'] = data_merged['y_raw'] - self.model.endog.mean()
+        data_merged['sse'] = data_merged['y_raw'] - y_norm_func_rev_training(pd.DataFrame(self.model.endog)).mean().values
 
         def _generate_one_day_stats(c):
             mse_ = (c['sse'] * c['sse']).sum()

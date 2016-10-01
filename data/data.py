@@ -192,7 +192,7 @@ class DataBase:
 
                     assert len(y_series_drop_na.columns) == 1
                     y_series_normalize_func_reverse = lambda y_: pd.DataFrame(
-                        [(y_[col] + y_series_drop_na.iloc[:, 0].mean()) * y_series_drop_na.iloc[:, 0].std() if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
+                        [(y_[col] * y_series_drop_na.iloc[:, 0].std() + y_series_drop_na.iloc[:, 0].mean()) if col != 'mid_px_ret_dummy' else y_[col] for col in y_]).T
 
             else:
                 x_series_normalize_func, y_series_normalize_func = lambda x: x, lambda x: x

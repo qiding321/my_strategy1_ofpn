@@ -26,6 +26,11 @@ class DataBase:
         assert isinstance(para_dict, dict)
         self.source_data_path = my_path.path.data_source_path
         self.para_dict = para_dict
+
+        self.raw_data_len = None
+        self.trancated_len_dict = None
+        self.final_data_len = None
+
         if not have_data_df:
             self.date_begin = date_begin
             self.date_end = date_end
@@ -240,18 +245,21 @@ class DataBase:
             x_vars_name = x_vars_name_raw1
 
         x_vars_raw = self._get_vars(x_vars_name, time_freq)
+        self.raw_data_len = len(x_vars_raw)
 
         # ================================== trancate ==================================
         x_vars_not_trancated_nona, y_vars_not_trancated_nona = self._dropna(x_vars_raw, y_vars_raw, to_log=True)
         trancate_para = self.para_dict['trancate_para']
         if trancate_para.trancate:
-            x_vars, x_trancated_dummy = self._trancate(x_vars_not_trancated_nona)
-            y_vars, y_trancated_dummy = self._trancate(y_vars_not_trancated_nona)
+            x_vars, x_trancated_dummy, trancated_len_dict_x = self._trancate(x_vars_not_trancated_nona)
+            y_vars, y_trancated_dummy, trancated_len_dict_y = self._trancate(y_vars_not_trancated_nona)
+            self.trancated_len_dict = trancated_len_dict_x
         else:
             x_vars, y_vars = x_vars_raw, y_vars_raw
 
         # ================================= drop na ===================================
         x_vars_dropna, y_vars_dropna = self._dropna(x_vars, y_vars, to_log=True)
+        self.final_data_len = len(y_vars_dropna)
         return y_vars_dropna, x_vars_dropna
 
     @classmethod
@@ -440,7 +448,10 @@ class DataBase:
             my_log.error('wrong trancate method: {}'.format(method_))
             raise ValueError
         trancated_dummy_df = pd.concat(trancated_dummy_list, axis=1, keys=vars_to_trancate)
-        return vars, trancated_dummy_df
+
+        trancated_len_dict = dict(list(zip(vars_to_trancate, [len(t_d_[t_d_ != 0]) for t_d_ in trancated_dummy_list])))
+
+        return vars, trancated_dummy_df, trancated_len_dict
 
     @classmethod
     def _trancate_mean_std(cls, var_col, window, trancate_std):
@@ -465,6 +476,21 @@ class DataBase:
             var_col_new.iloc[i] = point_new
             var_col_dummy.iloc[i] = dummy
         return var_col_new, var_col_dummy
+
+    def report_description_stats(self, output_path, name_time_period):
+        this_path = output_path + name_time_period + '\\'
+        if os.path.exists(this_path):
+            pass
+        else:
+            os.makedirs(this_path)
+        file_path = this_path + 'length_record.csv'
+        s_ = ''
+        s_ += 'raw_data_len,{raw_data_len}\nfinal_data_len,{final_data_len}\n'.format(raw_data_len=self.raw_data_len, final_data_len=self.final_data_len)
+        if self.trancated_len_dict is not None:
+            for k, v in self.trancated_len_dict.items():
+                s_ += str(k) + '_trancated,' + str(v) + '\n'
+        with open(file_path, 'w') as f_out:
+            f_out.write(s_)
 
 
 class TrainingData(DataBase):
@@ -549,3 +575,4 @@ class DataRolling(DataBase):
 
                 yield to_yield
             date_moving = date_moving + offset_predict
+

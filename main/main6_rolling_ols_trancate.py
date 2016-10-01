@@ -86,6 +86,9 @@ def main():
             reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
             reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs, normalize_funcs_training=normalize_funcs_useless)
 
+            data_training.report_description_stats(output_path, name_time_period=time_period_name)
+            data_predicting.report_description_stats(output_path, name_time_period=time_period_name)
+
         # ===========================model selection=====================
         if my_para['reg_name'] == 'model_selection':
             model_selection_result_this_time_period = dict()

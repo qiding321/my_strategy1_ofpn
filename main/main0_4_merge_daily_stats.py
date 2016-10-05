@@ -12,10 +12,10 @@ import pandas as pd
 import my_path.path
 
 path_root = my_path.path.market_making_result_root
-fold_name = '2016-10-02-00-57-36rolling_fixed_vars_OLS_12M_predict_1M_normalized_by_12M_notdivstd_1min_trancate_method_mean_std_period_60_std_3'
+fold_name = '2016-10-05-10-05-32rolling_fixed_vars_OLS_12M_predict_1M_normalized_by_12M_notdivstd_1min_trancate_method_mean_std_period_30_std_2'
 
 dates = [x for x in os.listdir(path_root + fold_name) if len(x.split('.')) == 1]
-predict_date = [x[18:18 + 8] for x in dates]
+predict_date = [x[0:8] for x in dates]
 
 
 def _str2datestr_(date_tuple_str):

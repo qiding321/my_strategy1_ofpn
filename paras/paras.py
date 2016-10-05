@@ -141,7 +141,9 @@ class Paras:
             trancate_std = 3
             # trancate_winsorize = 0.99
 
-            trancate_vars = ['buyvolume', 'sellvolume']
+            trancate_vars = []
+
+            # trancate_vars = ['buyvolume', 'sellvolume']
 
             @classmethod
             def descrip(cls):
@@ -229,14 +231,21 @@ class Paras:
         # para_type = 'all_vars'
 
         class trancate_para:
-            trancate = 'True'
+            trancate = False
             trancate_method = 'mean_std'
             # trancate_method = 'winsorize'
             trancate_window = 20
             trancate_std = 3
             # trancate_winsorize = 0.99
 
-            trancate_vars = ['buyvolume', 'sellvolume']
+            # x_trancate_vars = ['buyvolume', 'sellvolume']
+            x_trancate_vars = []
+            x_jump_vars = ['buyvolume', 'sellvolume']
+            replace_x = True
+
+            y_trancate_vars = []
+            y_jump_vars = ['buyvolume']
+
 
             @classmethod
             def descrip(cls):
@@ -298,7 +307,5 @@ class Paras:
         this_para['description'] = description
 
         this_para['reg_name'] = reg_name
-
-        this_para['y_vars'] = ['buyvolume_jump']
 
         return this_para

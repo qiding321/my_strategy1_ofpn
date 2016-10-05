@@ -250,12 +250,34 @@ class DataBase:
         # ================================== trancate ==================================
         x_vars_not_trancated_nona, y_vars_not_trancated_nona = self._dropna(x_vars_raw, y_vars_raw, to_log=True)
         trancate_para = self.para_dict['trancate_para']
-        if trancate_para.trancate:
-            x_vars, x_trancated_dummy, trancated_len_dict_x = self._trancate(x_vars_not_trancated_nona)
-            y_vars, y_trancated_dummy, trancated_len_dict_y = self._trancate(y_vars_not_trancated_nona)
+
+        x_vars_new = x_vars_not_trancated_nona
+        if trancate_para.x_trancate_vars:
+            x_vars_trancate, x_trancated_dummy, trancated_len_dict_x = self._get_trancate_vars(
+                x_vars_not_trancated_nona, to_trancate=trancate_para.x_trancate_vars, suffix='trancated')
+            x_vars_new = pd.concat([x_vars_new, x_vars_trancate], axis=1)
             self.trancated_len_dict = trancated_len_dict_x
-        else:
-            x_vars, y_vars = x_vars_not_trancated_nona, y_vars_not_trancated_nona
+        if trancate_para.x_jump_vars:
+            x_vars_trancate, x_trancated_dummy, trancated_len_dict_x = self._get_trancate_vars(
+                x_vars_not_trancated_nona, to_trancate=trancate_para.x_trancate_vars, suffix='jump')
+            x_vars_new = pd.concat([x_vars_new, x_trancated_dummy], axis=1)
+        if trancate_para.replace_x:
+            x_vars_new = x_vars_new.drop(
+                [col_ for col_ in trancate_para.x_trancate_vars + trancate_para.x_jump_vars if
+                 col_ in x_vars_new.columns]
+                , axis=1)
+        x_vars = x_vars_new
+
+        y_vars_new = y_vars_not_trancated_nona
+        if trancate_para.y_trancate_vars:
+            y_vars_trancate, y_trancated_dummy, trancated_len_dict_y = self._get_trancate_vars(
+                y_vars_not_trancated_nona, to_trancate=trancate_para.y_trancate_vars, suffix='trancated')
+            y_vars_new = y_vars_trancate
+        if trancate_para.y_jump_vars:
+            y_vars_trancate, y_trancated_dummy, trancated_len_dict_y = self._get_trancate_vars(
+                y_vars_not_trancated_nona, to_trancate=trancate_para.y_trancate_vars, suffix='jump')
+            y_vars_new = y_trancated_dummy
+        y_vars = y_vars_new
 
         # ================================= drop na ===================================
         x_vars_dropna, y_vars_dropna = self._dropna(x_vars, y_vars, to_log=True)
@@ -431,27 +453,31 @@ class DataBase:
             raise TypeError
         return data_new
 
-    def _trancate(self, vars):
+    def _get_trancate_vars(self, vars_, to_trancate, suffix=''):
+        add_suffix = lambda lst_: [l_ + '_' + suffix for l_ in lst_]
         trancate_para = self.para_dict['trancate_para']
-        vars_to_trancate = [var_ for var_ in trancate_para.trancate_vars if var_ in vars.columns]
+        vars_to_trancate = [var_ for var_ in to_trancate if var_ in vars_.columns]
         method_ = trancate_para.trancate_method
         trancate_window = trancate_para.trancate_window
         trancate_std = trancate_para.trancate_std
         trancated_dummy_list = []
+        trancated_var_list = []
         if method_ == 'mean_std':
             for var_ in vars_to_trancate:
                 my_log.info('trancate begin: ' + var_)
-                vars[var_], trancated_dummy_ = self._trancate_mean_std(var_col=vars[var_], window=trancate_window, trancate_std=trancate_std)
+                trancated_var_, trancated_dummy_ = self._trancate_mean_std(var_col=vars_[var_], window=trancate_window,
+                                                                           trancate_std=trancate_std)
+                trancated_var_list.append(trancated_var_)
                 trancated_dummy_list.append(trancated_dummy_)
                 my_log.info('trancate end: {}, trancated num: {}'.format(var_, len(trancated_dummy_[trancated_dummy_ != 0])))
         else:
             my_log.error('wrong trancate method: {}'.format(method_))
             raise ValueError
-        trancated_dummy_df = pd.concat(trancated_dummy_list, axis=1, keys=vars_to_trancate)
-
+        trancated_dummy_df = pd.concat(trancated_dummy_list, axis=1, keys=add_suffix(vars_to_trancate))
+        trancated_var_df = pd.concat(trancated_var_list, axis=1, keys=add_suffix(vars_to_trancate))
         trancated_len_dict = dict(list(zip(vars_to_trancate, [len(t_d_[t_d_ != 0]) for t_d_ in trancated_dummy_list])))
 
-        return vars, trancated_dummy_df, trancated_len_dict
+        return trancated_var_df, trancated_dummy_df, trancated_len_dict
 
     @classmethod
     def _trancate_mean_std(cls, var_col, window, trancate_std):

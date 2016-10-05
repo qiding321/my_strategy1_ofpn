@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-25-17-50-52rolling_model_selection_12M_predict_1M_normalized_by_12M_10min_10min\\'
+file_path = 'C:\\Users\\dqi\\Documents\\Output\\MarketMaking\\2016-09-30-15-36-51rolling_model_selection_OLS_12M_predict_1M_normalized_by_12M_all_vars_notdivstd_1min_trancate_method_mean_std_period_20_std_3\\'
 file_name = 'result_all.csv'
 vars_num = 1
 output_name = 'var_categories_' + str(vars_num) + 'vars.txt'

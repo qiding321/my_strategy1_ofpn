@@ -477,13 +477,13 @@ class DataBase:
             var_col_dummy.iloc[i] = dummy
         return var_col_new, var_col_dummy
 
-    def report_description_stats(self, output_path, name_time_period):
+    def report_description_stats(self, output_path, name_time_period, file_name):
         this_path = output_path + name_time_period + '\\'
         if os.path.exists(this_path):
             pass
         else:
             os.makedirs(this_path)
-        file_path = this_path + 'length_record.csv'
+        file_path = this_path + file_name
         s_ = ''
         s_ += 'raw_data_len,{raw_data_len}\nfinal_data_len,{final_data_len}\n'.format(raw_data_len=self.raw_data_len, final_data_len=self.final_data_len)
         if self.trancated_len_dict is not None:

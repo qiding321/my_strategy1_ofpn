@@ -61,6 +61,8 @@ def main():
             data_rolling_once[col] for col in ['data_training', 'data_predicting', 'data_out_of_sample_demean', 'in_sample_period', 'out_of_sample_period']
             ]
         assert isinstance(data_training, data.data.TrainingData) and isinstance(data_predicting, data.data.TestingData)
+
+        # ============================reg data=================
         reg_data_training, normalize_funcs_useless = data_training.generate_reg_data()
         reg_data_demean_useless, normalize_funcs = data_demean.generate_reg_data()
         reg_data_testing, normalize_funcs = data_predicting.generate_reg_data(normalize_funcs=normalize_funcs)
@@ -86,8 +88,8 @@ def main():
             reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
             reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs, normalize_funcs_training=normalize_funcs_useless)
 
-            data_training.report_description_stats(output_path, name_time_period=time_period_name)
-            data_predicting.report_description_stats(output_path, name_time_period=time_period_name)
+            data_training.report_description_stats(output_path, name_time_period=time_period_name, file_name='len_record_training.csv')
+            data_predicting.report_description_stats(output_path, name_time_period=time_period_name, file_name='len_record_predicting.csv')
 
         # ===========================model selection=====================
         if my_para['reg_name'] == 'model_selection':
@@ -178,6 +180,27 @@ def check_valid2(reg_data_vars_len):  # todo check
         return False
     else:
         return True
+
+
+# def record_data_length(data_training, data_predicting, in_sample_period, out_of_sample_period, output_path):
+#     assert isinstance(data_training, data.data.TrainingData)
+#     assert isinstance(data_predicting, data.data.TestingData)
+#     path_csv = output_path + 'data_length_record.csv'
+#     training_data_length =
+#     predicting_data_length =
+#     if os.path.exists(path_csv):
+#         pass
+#     else:
+#         title_ = 'in_sample_period,out_of_sample_period,' \
+#                  'in_sample_length_raw,in_sample_final,in_sample_trancated_buy,in_sample_trancated_sell' \
+#                  'out_of_sample_length_raw,out_of_sample_final,out_of_sample_trancated_buy,out_of_sample_trancated_sell'
+#         with open(path_csv, 'w') as f_out:
+#             f_out.write(title_)
+#     with open(path_csv, 'a') as f_out:
+#         to_rcd = ''
+#         to_rcd += in_sample_period + ',' + out_of_sample_period + ','
+#         to_rcd += ','.join([str(data_training.raw_data_len), str(data_training.final_data_len), str(data_training.trancated_len_dict['buyvolume'], str(data_training.trancated_len_dict['sellvolume']))])
+#         f_out.write()
 
 
 if __name__ == '__main__':

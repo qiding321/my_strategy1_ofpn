@@ -137,7 +137,7 @@ class Paras:
             trancate = 'True'
             trancate_method = 'mean_std'
             # trancate_method = 'winsorize'
-            trancate_window = 60
+            trancate_window = 20
             trancate_std = 3
             # trancate_winsorize = 0.99
 

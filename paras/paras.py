@@ -221,7 +221,7 @@ class Paras:
         testing_period = '1M'
         testing_demean_period = '12M'
 
-        reg_name = 'jump_fixed_vars'
+        reg_name = 'fixed_vars_jump'
         # reg_name = 'model_selection'
 
         normalize = True
@@ -242,8 +242,8 @@ class Paras:
             trancate = False
             trancate_method = 'mean_std'
             # trancate_method = 'winsorize'
-            trancate_window = 20
-            trancate_std = 3
+            trancate_window = 30
+            trancate_std = 2
             # trancate_winsorize = 0.99
 
             # x_trancate_vars = ['buyvolume', 'sellvolume']

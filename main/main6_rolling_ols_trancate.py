@@ -71,7 +71,7 @@ def main():
         assert isinstance(reg_data_testing, data.reg_data.RegDataTest)
 
         # ===========================reg and predict=====================
-        if my_para['reg_name'] == 'fixed_vars':
+        if my_para['reg_name'].startswith('fixed_vars'):
             reg_result = reg_data_training.fit()
             reg_data_testing.add_model(reg_data_training.model, reg_data_training.paras_reg)
             predict_result = reg_data_testing.predict()
@@ -92,7 +92,7 @@ def main():
             data_predicting.report_description_stats(output_path, name_time_period=time_period_name, file_name='len_record_predicting.csv')
 
         # ===========================model selection=====================
-        if my_para['reg_name'] == 'model_selection':
+        if my_para['reg_name'].startswith('model_selection'):
             model_selection_result_this_time_period = dict()
             name = in_sample_period + '_' + out_of_sample_period
 

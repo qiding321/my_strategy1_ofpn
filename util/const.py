@@ -36,4 +36,8 @@ class fitting_method:
     def ADABOOST(self):
         return 'DecisionTreeAdaboost'
 
+    @property
+    def LOGIT(self):
+        return 'Logit'
+
 FITTING_METHOD = fitting_method()

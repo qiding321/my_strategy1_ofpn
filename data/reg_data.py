@@ -16,6 +16,7 @@ from sklearn.tree import DecisionTreeRegressor
 
 import log.log
 import util.const
+import util.logit_wrapper
 import util.util
 
 my_log = log.log.log_order_flow_predict
@@ -57,6 +58,11 @@ class RegDataTraining:
             self.model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=decision_tree_depth), n_estimators=300, random_state=rng)
             self.model.fit(self.x_vars, self.y_vars)
             y_predict_insample = self.model.predict(self.x_vars)
+            self.y_predict_insample = y_predict_insample
+        elif method == util.const.FITTING_METHOD.LOGIT:
+            self.model = util.logit_wrapper.LogitWrapper(endog=self.y_vars, exog=self.x_vars)
+            self.paras_reg, separator = self.model.fit()
+            y_predict_insample = self.model.predict(exog=self.x_vars, params=self.paras_reg.params, separator=separator)
             self.y_predict_insample = y_predict_insample
         else:
             my_log.error('reg_method not found: {}'.format(method))
@@ -120,6 +126,20 @@ class RegDataTest:
                 self.predict_y = data_predict
             else:
                 data_predict = self.predict_y
+        elif method == util.const.FITTING_METHOD.LOGIT:
+            if self.predict_y is None:
+                if add_const:
+                    data_predict = self.model.predict(exog=sm.add_constant(self.x_vars), params=self.paras_reg.params)
+                else:
+                    data_predict = self.model.predict(exog=self.x_vars, params=self.paras_reg.params)
+                self.predict_y = data_predict
+            else:
+                data_predict = self.predict_y
+            ssr = (pd.DataFrame(data_predict) - pd.DataFrame(self.y_vars.values)).values
+            sse = (pd.DataFrame(self.y_vars.values) - self.model.endog.mean()).values  # for y_mean_in_sample, new
+            # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
+            rsquared_out_of_sample = 1 - (ssr * ssr).sum() / (sse * sse).sum()
+            return rsquared_out_of_sample
         else:
             my_log.error('method not found: {}'.format(method))
             raise ValueError

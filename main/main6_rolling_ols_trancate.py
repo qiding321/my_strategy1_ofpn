@@ -19,7 +19,7 @@ import util.util
 
 
 def main():
-    my_para = paras.paras.Paras().my_para
+    my_para = paras.paras.Paras().my_para_jump
     description = my_para['description']
     training_period, testing_period, testing_demean_period = (my_para[col] for col in ['training_period', 'testing_period', 'testing_demean_period'])
 

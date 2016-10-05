@@ -7,8 +7,7 @@ Created on 2016/9/28 10:19
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.tree import DecisionTreeRegressor
+import statsmodels.api as sm
 
 
 def generate_random_normal(size, mu, std):
@@ -40,7 +39,8 @@ def cal_r_squared(y_raw, y_predict, y_training):
 
 def main():
     # transform function
-    func = lambda x, err: x[0] * x[0] + x[1] * x[1] + err
+    # func = lambda x, err: x[0] * x[0] + x[1] * x[1] + err
+    func = lambda x, err: np.where((x[0] + x[1] + err) > 0, [1] * len(x[0]), [0] * len(x[0]))
 
     # data generation
     training_length = 10000
@@ -50,18 +50,22 @@ def main():
     testing_y, testing_x = generate_sample(func=func, length=testing_length)
 
     # training and fitting
-    rng = np.random.RandomState(1)
-    max_depth = 10
-    # training_model = DecisionTreeRegressor(max_depth=max_depth)
-    training_model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=max_depth), n_estimators=300, random_state=rng)
-    training_model.fit(training_x, training_y)
-    y_predict = training_model.predict(training_x)
-    y_predict_oos = training_model.predict(testing_x)
+    # rng = np.random.RandomState(1)
+    # max_depth = 10
+    # # training_model = DecisionTreeRegressor(max_depth=max_depth)
+    # training_model = AdaBoostRegressor(DecisionTreeRegressor(max_depth=max_depth), n_estimators=300, random_state=rng)
+    # training_model.fit(training_x, training_y)
+    # y_predict = training_model.predict(training_x)
+    # y_predict_oos = training_model.predict(testing_x)
+    #
+    # # r-squared
+    # r_sq_in_sample = cal_r_squared(y_raw=training_y, y_predict=y_predict, y_training=training_y)
+    # r_sq_out_of_sample = cal_r_squared(y_raw=testing_y, y_predict=y_predict_oos, y_training=training_y)
+    # print('rsq_in_sample: {}\nrsq_out_of_sample: {}'.format(r_sq_in_sample, r_sq_out_of_sample))
 
-    # r-squared
-    r_sq_in_sample = cal_r_squared(y_raw=training_y, y_predict=y_predict, y_training=training_y)
-    r_sq_out_of_sample = cal_r_squared(y_raw=testing_y, y_predict=y_predict_oos, y_training=training_y)
-    print('rsq_in_sample: {}\nrsq_out_of_sample: {}'.format(r_sq_in_sample, r_sq_out_of_sample))
+    model = sm.Logit(endog=training_y, exog=training_x)
+    params = model.fit()
+    predict_y = model.predict(params=params.params, exog=training_x)
 
 
 if __name__ == '__main__':

@@ -75,7 +75,7 @@ class Paras:
             'y_vars': ['buyvolume'],
             'spread_threshold': (0 * self.min_tick, 100 * self.min_tick),
             'lag_terms': [  # (var_name, [lags])
-                ('buyvolume', [2, 3]),
+                ('buyvolume_jump', [2, 3]),
             ],
             # 'high_order2_term_x': [
             #     'buyvolume'
@@ -127,7 +127,8 @@ class Paras:
         divided_std = False
 
         # method = util.const.FITTING_METHOD.ADABOOST
-        method = util.const.FITTING_METHOD.OLS
+        method = util.const.FITTING_METHOD.LOGIT
+        # method = util.const.FITTING_METHOD.OLS
         # method = util.const.FITTING_METHOD.DECTREE
 
         para_type = 'selected_vars'
@@ -141,7 +142,13 @@ class Paras:
             trancate_std = 3
             # trancate_winsorize = 0.99
 
-            trancate_vars = []
+            x_trancate_vars = ['buyvolume', 'sellvolume']
+            x_jump_vars = ['buyvolume', 'sellvolume']
+            # x_jump_vars = ['buyvolume', 'sellvolume']
+            replace_x = True
+
+            y_trancate_vars = []
+            y_jump_vars = ['buyvolume']
 
             # trancate_vars = ['buyvolume', 'sellvolume']
 
@@ -223,7 +230,8 @@ class Paras:
         divided_std = False
 
         # method = util.const.FITTING_METHOD.ADABOOST
-        method = util.const.FITTING_METHOD.OLS
+        method = util.const.FITTING_METHOD.LOGIT
+        # method = util.const.FITTING_METHOD.OLS
         # method = util.const.FITTING_METHOD.DECTREE
 
         para_type = 'selected_vars'
@@ -239,13 +247,12 @@ class Paras:
             # trancate_winsorize = 0.99
 
             # x_trancate_vars = ['buyvolume', 'sellvolume']
-            x_trancate_vars = []
+            x_trancate_vars = ['buyvolume', 'sellvolume']
             x_jump_vars = ['buyvolume', 'sellvolume']
             replace_x = True
 
             y_trancate_vars = []
             y_jump_vars = ['buyvolume']
-
 
             @classmethod
             def descrip(cls):
@@ -307,5 +314,10 @@ class Paras:
         this_para['description'] = description
 
         this_para['reg_name'] = reg_name
+
+        this_para['lag_terms'] = [
+            ('buyvolume_jump', [2, 3]),
+            ('buyvolume_trancated', [2, 3])
+        ]
 
         return this_para

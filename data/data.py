@@ -259,11 +259,11 @@ class DataBase:
             self.trancated_len_dict = trancated_len_dict_x
         if trancate_para.x_jump_vars:
             x_vars_trancate, x_trancated_dummy, trancated_len_dict_x = self._get_trancate_vars(
-                x_vars_not_trancated_nona, to_trancate=trancate_para.x_trancate_vars, suffix='jump')
+                x_vars_not_trancated_nona, to_trancate=trancate_para.x_jump_vars, suffix='jump')
             x_vars_new = pd.concat([x_vars_new, x_trancated_dummy], axis=1)
         if trancate_para.replace_x:
             x_vars_new = x_vars_new.drop(
-                [col_ for col_ in trancate_para.x_trancate_vars + trancate_para.x_jump_vars if
+                [col_ for col_ in list(set(trancate_para.x_trancate_vars + trancate_para.x_jump_vars)) if
                  col_ in x_vars_new.columns]
                 , axis=1)
         x_vars = x_vars_new
@@ -275,7 +275,7 @@ class DataBase:
             y_vars_new = y_vars_trancate
         if trancate_para.y_jump_vars:
             y_vars_trancate, y_trancated_dummy, trancated_len_dict_y = self._get_trancate_vars(
-                y_vars_not_trancated_nona, to_trancate=trancate_para.y_trancate_vars, suffix='jump')
+                y_vars_not_trancated_nona, to_trancate=trancate_para.y_jump_vars, suffix='jump')
             y_vars_new = y_trancated_dummy
         y_vars = y_vars_new
 

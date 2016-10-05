@@ -255,7 +255,7 @@ class DataBase:
             y_vars, y_trancated_dummy, trancated_len_dict_y = self._trancate(y_vars_not_trancated_nona)
             self.trancated_len_dict = trancated_len_dict_x
         else:
-            x_vars, y_vars = x_vars_raw, y_vars_raw
+            x_vars, y_vars = x_vars_not_trancated_nona, y_vars_not_trancated_nona
 
         # ================================= drop na ===================================
         x_vars_dropna, y_vars_dropna = self._dropna(x_vars, y_vars, to_log=True)

@@ -121,14 +121,14 @@ class Paras:
         reg_name = 'fixed_vars'
         # reg_name = 'model_selection'
 
-        normalize = True
-        # normalize = False
+        # normalize = True
+        normalize = False
         # divided_std = True
         divided_std = False
 
         # method = util.const.FITTING_METHOD.ADABOOST
-        method = util.const.FITTING_METHOD.LOGIT
-        # method = util.const.FITTING_METHOD.OLS
+        # method = util.const.FITTING_METHOD.LOGIT
+        method = util.const.FITTING_METHOD.OLS
         # method = util.const.FITTING_METHOD.DECTREE
 
         para_type = 'selected_vars'
@@ -138,7 +138,7 @@ class Paras:
             trancate = 'True'
             trancate_method = 'mean_std'
             # trancate_method = 'winsorize'
-            trancate_window = 60
+            trancate_window = 30
             trancate_std = 1
             # trancate_winsorize = 0.99
 
@@ -147,8 +147,8 @@ class Paras:
             # x_jump_vars = ['buyvolume', 'sellvolume']
             replace_x = True
 
-            y_trancate_vars = []
-            y_jump_vars = ['buyvolume']
+            y_trancate_vars = ['buyvolume']
+            y_jump_vars = []
 
             # trancate_vars = ['buyvolume', 'sellvolume']
 

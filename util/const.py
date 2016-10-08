@@ -29,8 +29,12 @@ class fitting_method:
         return 'OLS'
 
     @property
-    def DECTREE(self):
+    def DECTREEREG(self):
         return 'DecisionTreeRegression'
+
+    @property
+    def DECTREE(self):
+        return 'DecisionTreeClassifier'
 
     @property
     def ADABOOST(self):

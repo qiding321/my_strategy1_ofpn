@@ -493,9 +493,9 @@ class DataBase:
             if point_raw >= mean_tmp + trancate_std * std_tmp:
                 point_new = mean_tmp + trancate_std * std_tmp
                 dummy = 1
-            elif point_raw <= mean_tmp - trancate_std * std_tmp:
-                point_new = mean_tmp - trancate_std * std_tmp
-                dummy = -1
+            # elif point_raw <= mean_tmp - trancate_std * std_tmp:
+            #     point_new = mean_tmp - trancate_std * std_tmp
+            #     dummy = -1
             else:
                 point_new = point_raw
                 dummy = 0

@@ -19,7 +19,8 @@ import util.util
 
 
 def main():
-    my_para = paras.paras.Paras().my_para_jump
+    my_para = paras.paras.Paras().my_para
+    # my_para = paras.paras.Paras().my_para_jump
     description = my_para['description']
     training_period, testing_period, testing_demean_period = (my_para[col] for col in ['training_period', 'testing_period', 'testing_demean_period'])
 
@@ -85,6 +86,7 @@ def main():
                 f_out.write(to_record)
             time_period_name = out_of_sample_period
             err_testing = reg_data_testing.get_err()
+            reg_data_testing.report_accuracy(output_path=output_path, name=time_period_name)
             reg_data_testing.report_err(output_path, err_testing, name=time_period_name)
             reg_data_testing.report_monthly(output_path, name_time_period=time_period_name, normalize_funcs=normalize_funcs, normalize_funcs_training=normalize_funcs_useless)
 

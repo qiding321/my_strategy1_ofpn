@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from sklearn.ensemble import AdaBoostRegressor
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 
 import log.log
 import util.const
@@ -47,6 +47,12 @@ class RegDataTraining:
             self.y_predict_insample = self.model.predict(exog=x_new, params=self.paras_reg.params)
             return self.paras_reg.rsquared
         elif method == util.const.FITTING_METHOD.DECTREE:
+            decision_tree_depth = self.paras_model['decision_tree'].decision_tree_depth
+            self.model = DecisionTreeClassifier(max_depth=decision_tree_depth)
+            self.model.fit(self.x_vars, self.y_vars)
+            y_predict_insample = self.model.predict(self.x_vars)
+            self.y_predict_insample = y_predict_insample
+        elif method == util.const.FITTING_METHOD.DECTREEREG:
             decision_tree_depth = self.paras_model['decision_tree'].decision_tree_depth
             self.model = DecisionTreeRegressor(max_depth=decision_tree_depth)
             self.model.fit(self.x_vars, self.y_vars)
@@ -120,7 +126,7 @@ class RegDataTest:
             # sse = (pd.DataFrame(self.y_vars.values) - pd.DataFrame(self.y_vars.values).mean()).values  # for y_mean_out_of_sample, old
             rsquared_out_of_sample = 1 - (ssr * ssr).sum() / (sse * sse).sum()
             return rsquared_out_of_sample
-        elif method == util.const.FITTING_METHOD.DECTREE or method == util.const.FITTING_METHOD.ADABOOST:
+        elif method == util.const.FITTING_METHOD.DECTREE or method == util.const.FITTING_METHOD.ADABOOST or method == util.const.FITTING_METHOD.DECTREEREG:
             if self.predict_y is None:
                 data_predict = self.model.predict(self.x_vars)
                 self.predict_y = data_predict
@@ -242,6 +248,35 @@ class RegDataTest:
             data_to_rcd = new_df
 
         data_to_rcd.sort_index(axis=1).to_csv(output_path + file_name)
+
+    def report_accuracy(self, output_path, name):
+        file_name = 'accuracy_record.csv'
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        data_raw = pd.Series(self.y_vars)
+        data_predict = pd.Series(self.predict_y)
+
+        def _get_len(a_, b_):
+            s_ = (data_raw == a_) & (data_predict == b_)
+            return len(s_[s_])
+
+        len_11 = _get_len(1, 1)
+        len_10 = _get_len(1, 0)
+        len_01 = _get_len(0, 1)
+        len_00 = _get_len(0, 0)
+
+        if file_name in os.listdir(output_path):
+            pass
+        else:
+            to_rcd = ','.join(['', 'predicted_jump', 'predicted_nut_jump', 'not_predict_jump', 'not_predict_not_jump'])
+            my_log.info(to_rcd)
+            with open(output_path + file_name, 'a') as f_out:
+                f_out.write(to_rcd)
+
+        to_rcd = '{},{},{},{},{}\n'.format(name, len_11, len_00, len_10, len_01)
+        my_log.info(to_rcd)
+        with open(output_path + file_name, 'a') as f_out:
+            f_out.write(to_rcd)
 
     def report_monthly(self, output_path, name_time_period, normalize_funcs, normalize_funcs_training):
         this_path = output_path + name_time_period + '\\'
